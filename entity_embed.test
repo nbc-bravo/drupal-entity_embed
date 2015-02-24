@@ -353,6 +353,11 @@ class AlignFilterTest extends DrupalUnitTestCase {
     );
   }
 
+  function setUp() {
+    drupal_load('module', 'entity_embed');
+    parent::setUp();
+  }
+
   /**
    * Tests the embed_button administration functionality.
    */
