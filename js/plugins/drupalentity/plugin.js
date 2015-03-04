@@ -12,7 +12,7 @@
     requires: 'widget',
 
     // The plugin initialization logic goes inside this method.
-    beforeInit: function (editor) {
+    init: function (editor) {
 
       // Generic command for adding/editing entities of all types.
       editor.addCommand('editdrupalentity', {
