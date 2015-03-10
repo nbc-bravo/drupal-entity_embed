@@ -92,6 +92,14 @@ function entity_embed_schema() {
         'default' => '',
         'description' => 'Entity type.',
       ),
+      'entity_type_bundles' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+        'object default' => array(),
+        'description' => 'Entity type bundles.',
+      ),
       'button_icon_fid' => array(
         'description' => 'The {file_managed}.fid of the image representing the button.',
         'type' => 'int',
@@ -109,4 +117,22 @@ function entity_embed_schema() {
   $schema['cache_entity_embed']['description'] = 'Cache table for the Entity Embed module to store embed button configurations.';
 
   return $schema;
+}
+
+/**
+ * Add support for restricting embedding to specific entity bundles.
+ */
+function entity_embed_update_7100() {
+  // Add new columns to {entity_embed}.
+  db_add_field('entity_embed', 'entity_type_bundles', array(
+    'type' => 'text',
+    'size' => 'big',
+    'not null' => TRUE,
+    'serialize' => TRUE,
+    'object default' => array(),
+    'description' => 'Entity type bundles.',
+  ));
+
+  // Clear the cache_entity_embed cache.
+  cache_clear_all(NULL, 'cache_entity_embed');
 }

@@ -167,6 +167,13 @@ function _entity_embed_button_is_enabled($filter_format, $embed_button) {
 }
 
 /**
+ * Implements hook_flush_caches().
+ */
+function entity_embed_flush_caches() {
+  return array('cache_entity_embed');
+}
+
+/**
  * Returns an Ajax response to generate preview of an entity.
  *
  * Expects the the HTML element as GET parameter.
@@ -211,6 +218,7 @@ function entity_embed_autocomplete_entity($filter_format, $embed_button, $string
   $matches = array();
 
   $entity_type_id = $embed_button->entity_type;
+  $entity_type_bundles = $embed_button->entity_type_bundles;
   $entity_type = entity_get_info($entity_type_id);
 
   // Prevent errors if the entity type has no label key.
@@ -224,6 +232,11 @@ function entity_embed_autocomplete_entity($filter_format, $embed_button, $string
     ->range(0, 10)
     ->propertyOrderBy($entity_type['entity keys']['label'], 'DESC')
     ->execute();
+
+  // Add optional bundle restrictions.
+  if (!empty($entity_type_bundles)) {
+    $query->entityCondition('bundle', array_keys($entity_type_bundles));
+  }
 
   $results = $query->execute();
 

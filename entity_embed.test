@@ -232,6 +232,7 @@ class EmbedButtonAdminTest extends EntityEmbedTestBase {
       'entity_type' => 'node',
       'button_label' => $name,
     );
+    $this->drupalPost(NULL, $edit, t('Choose'));
     $this->drupalPost(NULL, $edit, t('Save'));
     // Ensure that the newly created button exists.
     $this->drupalGet('admin/config/content/embed-button/list/' . $button_id);
