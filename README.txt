@@ -26,7 +26,7 @@ Drupal core modules
 
 Contributed modules
  * Chaos Tools
- * CKEditor - patched with https://www.drupal.org/node/2159403#comment-9518083
+ * CKEditor - The latest development release.
  * Entity
  * jQuery Update - Configured to use jQuery 1.7 or higher.
 
