@@ -96,7 +96,15 @@ function entity_embed_dialog_form($form, &$form_state, $input, $filter_format, $
       }
 
       $default = '';
-      if ($entity = entity_load_single($entity_element['data-entity-type'], $entity_element['data-entity-uuid'] ?: $entity_element['data-entity-id'])) {
+      if (!empty($entity_element['data-entity-uuid'])) {
+        $entity = entity_uuid_load($entity_element['data-entity-type'], array($entity_element['data-entity-uuid']));
+        $entity = reset($entity);
+      }
+      else {
+        $entity = entity_load_single($entity_element['data-entity-type'], $entity_element['data-entity-id']);
+      }
+
+      if ($entity) {
         $default = entity_label($entity_element['data-entity-type'], $entity);
       }
 
@@ -142,7 +150,13 @@ function entity_embed_dialog_form($form, &$form_state, $input, $filter_format, $
     case 'embed':
       $form['#title'] = t('Edit embedded entity');
 
-      $entity = entity_load_single($entity_element['data-entity-type'], $entity_element['data-entity-uuid'] ?: $entity_element['data-entity-id']);
+      if (!empty($entity_element['data-entity-uuid'])) {
+        $entity = entity_uuid_load($entity_element['data-entity-type'], array($entity_element['data-entity-uuid']));
+        $entity = reset($entity);
+      }
+      else {
+        $entity = entity_load_single($entity_element['data-entity-type'], $entity_element['data-entity-id']);
+      }
 
       $text = t('Preview selected entity');
       if ($entity) {

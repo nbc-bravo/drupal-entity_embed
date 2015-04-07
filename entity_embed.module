@@ -403,8 +403,16 @@ function _entity_embed_render_placeholders($text) {
 
       try {
         // Load the entity either by UUID (preferred) or ID.
-        $id = $node->getAttribute('data-entity-uuid') ?: $node->getAttribute('data-entity-id');
-        $entity = entity_load_single($entity_type, $id);
+        $uuid = $node->getAttribute('data-entity-uuid');
+        $id = $node->getAttribute('data-entity-id');
+
+        if (!empty($uuid)) {
+          $entity = entity_uuid_load($entity_type, array($uuid));
+          $entity = reset($entity);
+        }
+        else {
+          $entity = entity_load_single($entity_type, $id);
+        }
 
         if ($entity) {
           // If a UUID was not used, but is available, add it to the HTML.
@@ -527,9 +535,10 @@ function entity_embed_build_placeholder($entity_type, $entity, $context = array(
   $callback = 'entity_embed_render_embed';
   list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
 
+  $context['data-entity-type'] = $entity_type;
+  $context['data-entity-id'] = $id;
+
   $context += array(
-    'data-entity-type' => $entity_type,
-    'data-entity-id' => $id,
     'data-entity-embed-display' => 'default',
     'data-entity-embed-settings' => array(),
     'data-langcode' => NULL,
