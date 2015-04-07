@@ -303,14 +303,15 @@ function entity_embed_dialog_form_validate($form, &$form_state) {
           if (!entity_access('view', $entity_type, $entity)) {
             form_set_error('data-entity-id', t('Unable to access @type entity @id.', array('@type' => $entity_type, '@id' => $title)));
           }
-          elseif (isset($entity->uuid)) {
-            $uuid = $entity->uuid;
-            form_set_value($form['attributes']['data-entity-uuid'], $uuid, $form_state);
-            form_set_value($form['attributes']['data-entity-id'], $id, $form_state);
-          }
           else {
-            form_set_value($form['attributes']['data-entity-uuid'], '', $form_state);
             form_set_value($form['attributes']['data-entity-id'], $id, $form_state);
+
+            if (isset($entity->uuid)) {
+              form_set_value($form['attributes']['data-entity-uuid'], $entity->uuid, $form_state);
+            }
+            else {
+              form_set_value($form['attributes']['data-entity-uuid'], '', $form_state);
+            }
           }
         }
         else {
