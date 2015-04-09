@@ -30,6 +30,49 @@ function entity_embed_requirements($phase) {
         'severity' => REQUIREMENT_ERROR,
       );
     }
+
+    // Check if the site is running >= CKEditor 4.3.
+    if (($version = ckeditor_get_version()) && version_compare($version, 4.3, '>=')) {
+      $requirements['entity_embed_ckeditor'] = array(
+        'title' => t('Entity Embed CKEditor version'),
+        'value' => t('CKEditor @version', array('@version' => $version)),
+        'severity' => REQUIREMENT_OK,
+      );
+    }
+    else {
+      $requirements['entity_embed_ckeditor'] = array(
+        'title' => t('Entity Embed CKEditor version'),
+        'value' => t('CKEditor @version', array('@version' => $version)),
+        'description' => t('Entity Embed requires CKEditor 4.3 or greater. Download the latest version of <a href="@ckeditor">CKEditor</a>.', array('@ckeditor' => 'http://ckeditor.com/download')),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+
+    $editor_path = _ckeditor_script_path();
+    $editor_path = strtr($editor_path, array(
+      "%b" => ckeditor_base_path('local'),
+      "%m" => ckeditor_module_path('local'),
+      "%l" => ckeditor_library_path('local')
+    ));
+
+    $widget_path = $editor_path . '/plugins/widget';
+
+    // Check if the CKEditor Widget plugin is available.
+    if (file_exists($widget_path)) {
+      $requirements['entity_embed_widget'] = array(
+        'title' => t('Entity Embed CKEditor Widget plugin'),
+        'value' => t('Widget plugin found at <code>@path</code>', array('@path' => $widget_path)),
+        'severity' => REQUIREMENT_OK,
+      );
+    }
+    else {
+      $requirements['entity_embed_widget'] = array(
+        'title' => t('Entity Embed CKEditor Widget plugin'),
+        'value' => t('Widget plugin not found at <code>@path</code>', array('@path' => $widget_path)),
+        'description' => t('Entity Embed requires the CKEditor Widget API provided by the Widget plugin. Download the latest version of the <a href="@widget">Widget</a> plugin.', array('@widget' => 'http://ckeditor.com/addon/widget')),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
   }
 
   return $requirements;
