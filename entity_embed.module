@@ -406,7 +406,7 @@ function _entity_embed_render_placeholders($text) {
         $uuid = $node->getAttribute('data-entity-uuid');
         $id = $node->getAttribute('data-entity-id');
 
-        if (!empty($uuid)) {
+        if (!empty($uuid) && module_exists('uuid')) {
           $entity = entity_uuid_load($entity_type, array($uuid));
           $entity = reset($entity);
         }

@@ -96,7 +96,7 @@ function entity_embed_dialog_form($form, &$form_state, $input, $filter_format, $
       }
 
       $default = '';
-      if (!empty($entity_element['data-entity-uuid'])) {
+      if (!empty($entity_element['data-entity-uuid']) && module_exists('uuid')) {
         $entity = entity_uuid_load($entity_element['data-entity-type'], array($entity_element['data-entity-uuid']));
         $entity = reset($entity);
       }
@@ -150,7 +150,7 @@ function entity_embed_dialog_form($form, &$form_state, $input, $filter_format, $
     case 'embed':
       $form['#title'] = t('Edit embedded entity');
 
-      if (!empty($entity_element['data-entity-uuid'])) {
+      if (!empty($entity_element['data-entity-uuid']) && module_exists('uuid')) {
         $entity = entity_uuid_load($entity_element['data-entity-type'], array($entity_element['data-entity-uuid']));
         $entity = reset($entity);
       }
