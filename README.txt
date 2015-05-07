@@ -19,7 +19,8 @@ a text area.
 REQUIREMENTS
 ------------
 
-Entity Embed has five dependencies and requires two libraries.
+Entity Embed requires Drupal 7.37 or later. It has five dependencies and needs
+two libraries.
 
 Drupal core modules
  * Filter
