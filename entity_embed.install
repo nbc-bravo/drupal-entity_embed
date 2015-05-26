@@ -48,30 +48,57 @@ function entity_embed_requirements($phase) {
       );
     }
 
-    $editor_path = _ckeditor_script_path();
-    $editor_path = strtr($editor_path, array(
-      "%b" => ckeditor_base_path('local'),
-      "%m" => ckeditor_module_path('local'),
-      "%l" => ckeditor_library_path('local')
-    ));
+    $ckeditor_path = ckeditor_path('local');
 
-    $widget_path = $editor_path . '/plugins/widget';
+    // CKEditor may either be installed locally or included via a CDN.
+    if ($ckeditor_path != '<URL>') {
+      $editor_path = _ckeditor_script_path();
 
-    // Check if the CKEditor Widget plugin is available.
-    if (file_exists($widget_path)) {
-      $requirements['entity_embed_widget'] = array(
-        'title' => t('Entity Embed CKEditor Widget plugin'),
-        'value' => t('Widget plugin found at <code>@path</code>', array('@path' => $widget_path)),
-        'severity' => REQUIREMENT_OK,
-      );
+      $editor_path = strtr($editor_path, array(
+        "%b" => ckeditor_base_path('local'),
+        "%m" => ckeditor_module_path('local'),
+        "%l" => ckeditor_library_path('local')
+      ));
+
+      $widget_path = $editor_path . '/plugins/widget';
+
+      // Check if the CKEditor Widget plugin is available.
+      if (file_exists($widget_path)) {
+        $requirements['entity_embed_widget'] = array(
+          'title' => t('Entity Embed CKEditor Widget plugin'),
+          'value' => t('Widget plugin found at <code>@path</code>', array('@path' => $widget_path)),
+          'severity' => REQUIREMENT_OK,
+        );
+      }
+      else {
+        $requirements['entity_embed_widget'] = array(
+          'title' => t('Entity Embed CKEditor Widget plugin'),
+          'value' => t('Widget plugin not found at <code>@path</code>', array('@path' => $widget_path)),
+          'description' => t('Entity Embed requires the CKEditor Widget API provided by the Widget plugin. Download the latest version of the <a href="@widget">Widget</a> plugin.', array('@widget' => 'http://ckeditor.com/addon/widget')),
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
     }
     else {
-      $requirements['entity_embed_widget'] = array(
-        'title' => t('Entity Embed CKEditor Widget plugin'),
-        'value' => t('Widget plugin not found at <code>@path</code>', array('@path' => $widget_path)),
-        'description' => t('Entity Embed requires the CKEditor Widget API provided by the Widget plugin. Download the latest version of the <a href="@widget">Widget</a> plugin.', array('@widget' => 'http://ckeditor.com/addon/widget')),
-        'severity' => REQUIREMENT_ERROR,
-      );
+      $editor_url = ckeditor_path('url');
+
+      // The CKEditor Widget plugin is included with the standard-all and
+      // full-all distributions.
+      if (preg_match("/\/(standard|full)-all/", $editor_url)) {
+        $requirements['entity_embed_widget'] = array(
+          'title' => t('Entity Embed CKEditor Widget plugin'),
+          'value' => t('Widget plugin included with the current CKEditor CDN distribution.'),
+          'severity' => REQUIREMENT_OK,
+        );
+      }
+      else {
+        $requirements['entity_embed_widget'] = array(
+          'title' => t('Entity Embed CKEditor Widget plugin'),
+          'value' => t('Widget plugin not included with the current CKEditor CDN distribution.'),
+          'description' => t('Entity Embed requires the CKEditor Widget API provided by the Widget plugin. You must use either the standard-all or full-all <a href="@distributions">CKEditor CDN distributions</a>.', array('@distributions' => 'https://cdn.ckeditor.com/#url-structure')),
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
     }
   }
 
