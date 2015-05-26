@@ -61,6 +61,7 @@ INSTALLATION
 * To enable the WYSIWYG plugin, move the entity-embed 'E' button into the
   Active toolbar for the desired text formats from the CKEditor configuration
   page: '/admin/config/content/ckeditor'.
+* Disable CKEditor's Advanced Content Filter for each of the text formats.
 
 By default, Entity Embed includes a single button for embedding nodes.
 Additional buttons can be added from the configuration page:
