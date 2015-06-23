@@ -60,6 +60,25 @@ function entity_embed_requirements($phase) {
         "%l" => ckeditor_library_path('local')
       ));
 
+      $lineutils_path = $editor_path . '/plugins/lineutils';
+
+      // Check if the CKEditor Line Utilities plugin is available.
+      if (file_exists($lineutils_path)) {
+        $requirements['entity_embed_lineutils'] = array(
+          'title' => t('Entity Embed CKEditor Line Utilities plugin'),
+          'value' => t('Line Utilities plugin found at <code>@path</code>', array('@path' => $lineutils_path)),
+          'severity' => REQUIREMENT_OK,
+        );
+      }
+      else {
+        $requirements['entity_embed_lineutils'] = array(
+          'title' => t('Entity Embed CKEditor Line Utilities plugin'),
+          'value' => t('Widget plugin not found at <code>@path</code>', array('@path' => $lineutils_path)),
+          'description' => t('Entity Embed requires the CKEditor Line Utilities plugin. Download the latest version of the <a href="@lineutils">Line Utilities</a> plugin.', array('@lineutils' => 'http://ckeditor.com/addon/lineutils')),
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
+
       $widget_path = $editor_path . '/plugins/widget';
 
       // Check if the CKEditor Widget plugin is available.
@@ -82,9 +101,14 @@ function entity_embed_requirements($phase) {
     else {
       $editor_url = ckeditor_path('url');
 
-      // The CKEditor Widget plugin is included with the standard-all and
-      // full-all distributions.
+      // The CKEditor Line Utilities and Widget plugins are included with the
+      // standard-all and full-all distributions.
       if (preg_match("/\/(standard|full)-all/", $editor_url)) {
+        $requirements['entity_embed_lineutils'] = array(
+          'title' => t('Entity Embed CKEditor Line Utilities plugin'),
+          'value' => t('Line Utilities plugin included with the current CKEditor CDN distribution.'),
+          'severity' => REQUIREMENT_OK,
+        );
         $requirements['entity_embed_widget'] = array(
           'title' => t('Entity Embed CKEditor Widget plugin'),
           'value' => t('Widget plugin included with the current CKEditor CDN distribution.'),
@@ -92,6 +116,12 @@ function entity_embed_requirements($phase) {
         );
       }
       else {
+        $requirements['entity_embed_lineutils'] = array(
+          'title' => t('Entity Embed CKEditor Line Utilities plugin'),
+          'value' => t('Line Utilities plugin not included with the current CKEditor CDN distribution.'),
+          'description' => t('Entity Embed requires the CKEditor Line Utilities plugin. You must use either the standard-all or full-all <a href="@distributions">CKEditor CDN distributions</a>.', array('@distributions' => 'https://cdn.ckeditor.com/#url-structure')),
+          'severity' => REQUIREMENT_ERROR,
+        );
         $requirements['entity_embed_widget'] = array(
           'title' => t('Entity Embed CKEditor Widget plugin'),
           'value' => t('Widget plugin not included with the current CKEditor CDN distribution.'),

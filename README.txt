@@ -34,6 +34,8 @@ Contributed modules
 Libraries
  * CKEditor - Version 4.3 or later.
    http://ckeditor.com/download
+ * CKEditor Line Utilities plugin - Compatible with the installed version of CKEditor.
+   http://ckeditor.com/addon/lineutils
  * CKEditor Widget plugin - Compatible with the installed version of CKEditor.
    http://ckeditor.com/addon/widget
 
@@ -46,6 +48,9 @@ INSTALLATION
   download the CKEditor library (http://ckeditor.com/download) and extract it to
   'sites/all/libraries' or 'sites/sitename/libraries' as you require. The
   extracted folder must be named 'ckeditor'.
+* Download the Line Utilities plugin (http://ckeditor.com/addon/lineutils),
+  extract it and move it into the 'plugins' directory of the 'ckeditor' folder
+  so that it is available at 'ckeditor/plugins/lineutils'.
 * Download the Widget plugin (http://ckeditor.com/addon/widget), extract it and
   move it into the 'plugins' directory of the 'ckeditor' folder so that it is
   available at 'ckeditor/plugins/widget'.
