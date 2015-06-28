@@ -141,7 +141,7 @@ function entity_embed_ctools_export_ui_form(&$form, &$form_state) {
     '#upload_location' => file_default_scheme() . '://entity_embed/',
     '#upload_validators' => array(
       'file_validate_extensions' => array('gif png jpg jpeg'),
-      'file_validate_image_resolution' => array('16x16'),
+      'file_validate_image_resolution' => array('32x32', '16x16'),
     ),
   );
 }
