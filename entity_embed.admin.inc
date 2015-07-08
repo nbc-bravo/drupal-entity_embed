@@ -6,33 +6,6 @@
  */
 
 /**
- * Menu callback; Provide the dialog for embedding entities.
- */
-function entity_embed_dialog($filter_format, $embed_button) {
-  $input = $_POST;
-
-  $dialog_options = array();
-
-  if (isset($input['dialog'])) {
-    $dialog_options = $input['dialog'];
-  }
-
-  // Render the content.
-  $form = drupal_get_form('entity_embed_dialog_form', $input, $filter_format, $embed_button);
-
-  // Determine the title: use the title provided by the form if any, otherwise
-  // get it from the menu item.
-  $title = isset($form['#title']) ? $form['#title'] : drupal_get_title();
-
-  $content = drupal_render($form);
-  drupal_process_attached($form);
-
-  $commands[] = entity_embed_command_open_modal_dialog($title, $content, $dialog_options);
-
-  return array('#type' => 'ajax', '#commands' => $commands);
-}
-
-/**
  * Form constructor for the entity embed dialog form.
  *
  * Allows the user to select and embed an entity.
@@ -40,7 +13,9 @@ function entity_embed_dialog($filter_format, $embed_button) {
  * @see entity_embed_dialog_form_validate()
  * @ingroup forms
  */
-function entity_embed_dialog_form($form, &$form_state, $input, $filter_format, $embed_button) {
+function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_button) {
+  $input = $_POST;
+
   $values = isset($form_state['values']) ? $form_state['values'] : array();
 
   // Initialize entity element with form attributes, if present.
@@ -434,7 +409,7 @@ function submitEmbedForm(&$form, $form_state) {
     }
 
     $commands[] = entity_embed_command_editor_dialog_save($values);
-    $commands[] = entity_embed_command_close_modal_dialog();
+    $commands[] = dialog_command_close_modal_dialog();
   }
 
   return array(

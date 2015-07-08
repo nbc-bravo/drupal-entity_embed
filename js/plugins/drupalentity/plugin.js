@@ -77,7 +77,7 @@
           };
 
           // Open the entity embed dialog for corresponding EmbedButton.
-          Drupal.entityEmbed.openDialog(editor, Drupal.settings.basePath + 'entity-embed/dialog/entity-embed/' + Drupal.settings.ckeditor.elements[editor.name] + '/' + embed_button_id, existingValues, saveCallback, dialogSettings);
+          Drupal.entityEmbed.openDialog(editor, Drupal.settings.basePath + 'entity-embed/dialog/entity-embed/' + Drupal.settings.ckeditor.elements[editor.name] + '/' + embed_button_id + '?_format=drupal_dialog', existingValues, saveCallback, dialogSettings);
         }
       });
 
@@ -304,7 +304,6 @@
       var $content = $('<div class="ckeditor-dialog-loading"><span style="top: -40px;" class="ckeditor-dialog-loading-link"><a>' + Drupal.t('Loading...') + '</a></span></div>');
       $content.appendTo($target);
       new Drupal.ajax('ckeditor-dialog', $content.find('a').get(0), {
-        accepts: 'application/vnd.drupal-modal',
         dialog: dialogSettings,
         selector: '.ckeditor-dialog-loading-link',
         url: url,

@@ -5,6 +5,7 @@ core = 7.x
 
 dependencies[] = ctools
 dependencies[] = ckeditor
+dependencies[] = dialog
 dependencies[] = entity
 dependencies[] = filter
 dependencies[] = jquery_update

@@ -42,13 +42,11 @@ function entity_embed_menu() {
 
   $items['entity-embed/dialog/entity-embed/%entity_embed_filter_format/%entity_embed_embed_button'] = array(
     'title' => 'Add/Edit embedded entity',
-    'page callback' => 'entity_embed_dialog',
-    'page arguments' => array(3, 4),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('entity_embed_dialog_form', 3, 4),
     'access callback' => '_entity_embed_button_is_enabled',
     'access arguments' => array(3, 4),
-    'delivery callback' => 'ajax_deliver',
     'file' => 'entity_embed.admin.inc',
-    'theme callback' => 'ajax_base_page_theme',
     'type' => MENU_CALLBACK,
   );
 
@@ -258,73 +256,6 @@ function entity_embed_autocomplete_entity($filter_format, $embed_button, $string
  * Implements hook_library(). 
  */
 function entity_embed_library() {
-  $libraries['drupal.dialog'] = array(
-    'title' => 'Drupal Dialog',
-    'website' => 'http://www.drupal.org',
-    'version' => VERSION,
-    'js' => array(
-      drupal_get_path('module', 'entity_embed') . '/js/dialog/dialog.js' => array(
-        'weight' => 2,
-      ),
-      drupal_get_path('module', 'entity_embed') . '/js/dialog/dialog.position.js' => array(
-        'weight' => 2,
-      ),
-      drupal_get_path('module', 'entity_embed') . '/js/dialog/dialog.jquery-ui.js' => array(
-        'weight' => 2,
-      ),
-    ),
-    'css' => array(
-      drupal_get_path('module', 'entity_embed') . '/js/dialog/dialog.theme.css' => array(),
-    ),
-    'dependencies' => array(
-      array('system', 'jquery'),
-      array('system', 'ui.dialog'),
-      array('entity_embed', 'drupal.debounce'),
-      array('entity_embed', 'drupal.displace'),
-    ),
-  );
-
-  $libraries['drupal.dialog.ajax'] = array(
-    'title' => 'Drupal AJAX Dialog',
-    'website' => 'http://www.drupal.org',
-    'version' => VERSION,
-    'js' => array(
-      drupal_get_path('module', 'entity_embed') . '/js/dialog/dialog.ajax.js' => array(
-        'weight' => 2,
-      ),
-    ),
-    'dependencies' => array(
-      array('system', 'jquery'),
-      array('system', 'drupal.ajax'),
-      array('entity_embed', 'drupal.dialog'),
-    ),
-  );
-
-  $libraries['drupal.displace'] = array(
-    'title' => 'Drupal Displace',
-    'website' => 'http://www.drupal.org',
-    'version' => VERSION,
-    'js' => array(
-      drupal_get_path('module', 'entity_embed') . '/js/drupal/displace.js' => array(
-        'weight' => 2,
-      ),
-    ),
-    'dependencies' => array(
-      array('system', 'jquery'),
-    ),
-  );
-
-  $libraries['drupal.debounce'] = array(
-    'title' => 'Drupal Debounce',
-    'website' => 'http://www.drupal.org',
-    'version' => VERSION,
-    'js' => array(
-      drupal_get_path('module', 'entity_embed') . '/js/drupal/debounce.js' => array(
-        'weight' => 2,
-      ),
-    ),
-  );
-
   $libraries['drupal.editor.dialog'] = array(
     'title' => 'Drupal Editor Dialog',
     'website' => 'http://www.drupal.org',
@@ -337,7 +268,7 @@ function entity_embed_library() {
     'dependencies' => array(
       array('system', 'jquery'),
       array('system', 'drupal.ajax'),
-      array('entity_embed', 'drupal.dialog'),
+      array('dialog', 'drupal.dialog'),
     ),
   );
 
@@ -646,7 +577,7 @@ function entity_embed_pre_render_text_format($element) {
     );
   }
 
-  $element['#attached']['library'][] = array('entity_embed', 'drupal.dialog.ajax');
+  $element['#attached']['library'][] = array('dialog', 'drupal.dialog.ajax');
 
   $element['#attached']['js'][] = array(
     'data' => array(
