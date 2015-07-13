@@ -519,6 +519,12 @@ function entity_embed_render_embed($entity, $context) {
   // rendering.
   $renderable_array = entity_view($context['data-entity-type'], array($entity), $context['data-entity-embed-settings']['view_mode'], $context['data-langcode']);
 
+  // Workaround for file_entity module that does not have the patch in
+  // https://www.drupal.org/node/2365821 applied yet.
+  if ($context['data-entity-type'] === 'file' && isset($renderable_array['files'])) {
+    $renderable_array = array('file' => reset($renderable_array));
+  }
+
   // The output of entity_view() is keyed by the entity type and ID.
   $build = $renderable_array[$context['data-entity-type']][$context['data-entity-id']];
 
