@@ -19,7 +19,7 @@ a text area.
 REQUIREMENTS
 ------------
 
-Entity Embed requires Drupal 7.37 or later. It has five dependencies and needs
+Entity Embed requires Drupal 7.37 or later. It has six dependencies and needs
 two libraries.
 
 Drupal core modules
@@ -28,6 +28,7 @@ Drupal core modules
 Contributed modules
  * Chaos Tools
  * CKEditor - The latest development release.
+ * Dialog
  * Entity
  * jQuery Update - Configured to use jQuery 1.7 or higher.
 
