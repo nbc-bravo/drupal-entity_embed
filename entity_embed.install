@@ -178,13 +178,6 @@ function entity_embed_schema() {
         'default' => '',
         'description' => 'Configuration machine name.',
       ),
-      'button_label' => array(
-        'type' => 'varchar',
-        'length' => 128,
-        'not null' => TRUE,
-        'default' => '',
-        'description' => 'Button label.',
-      ),
       'entity_type' => array(
         'type' => 'varchar',
         'length' => 128,
@@ -260,6 +253,17 @@ function entity_embed_update_7300() {
     'initial' => serialize(array()), // Set the value of 'display_plugins' to a serialized empty array for all existing embed buttons.
     'description' => 'Allowed display plugins.',
   ));
+
+  // Clear the cache_entity_embed cache.
+  cache_clear_all(NULL, 'cache_entity_embed');
+}
+
+/**
+ * Merge CKEditor button label and entity label.
+ */
+function entity_embed_update_7301() {
+  // Drop old 'button_label' column from {entity_embed}.
+  db_drop_field('entity_embed', 'button_label');
 
   // Clear the cache_entity_embed cache.
   cache_clear_all(NULL, 'cache_entity_embed');

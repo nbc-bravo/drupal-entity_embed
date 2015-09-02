@@ -19,9 +19,7 @@ function entity_embed_ckeditor_plugin() {
   );
 
   // Add user-defined buttons.
-  ctools_include('export');
-
-  $embed_buttons = ctools_export_crud_load_all('entity_embed');
+  $embed_buttons = entity_embed_embed_button_load_all();
 
   $buttons = array();
 
@@ -29,7 +27,7 @@ function entity_embed_ckeditor_plugin() {
     // CKEditor only supports icons relative to the plugin path.
     // @todo: Figure out how to support custom icons.
     $buttons[$embed_button->name] = array(
-      'label' => check_plain($embed_button->button_label),
+      'label' => check_plain($embed_button->admin_title),
       'icon' => 'entity.png',
     );
   }

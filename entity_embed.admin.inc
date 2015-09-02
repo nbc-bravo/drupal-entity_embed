@@ -240,7 +240,7 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
       );
       $form['attributes']['data-entity-label'] = array(
         '#type' => 'value',
-        '#value' => $embed_button->button_label,
+        '#value' => $embed_button->admin_title,
       );
 
       $plugin_id = !empty($values['attributes']['data-entity-embed-display']) ? $values['attributes']['data-entity-embed-display'] : $entity_element['data-entity-embed-display'];

@@ -51,15 +51,6 @@ function entity_embed_ctools_export_ui_form(&$form, &$form_state) {
   // Determine the currently selected entity type.
   $selected = isset($form_state['values']['entity_type']) ? $form_state['values']['entity_type'] : $preset->entity_type;
 
-  $form['button_label'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Button label'),
-    '#default_value' => $preset->button_label,
-    '#maxlength' => 64,
-    '#description' => t('The label used by CKEditor to identify the button.'),
-    '#required' => TRUE,
-  );
-
   $options = array();
   $entity_types = entity_get_info();
 
