@@ -354,7 +354,7 @@ function _entity_embed_render_placeholders($text, $filter, $format, $langcode, $
           static $depth = 0;
           $depth++;
           if ($depth > 20) {
-            throw new Exception(t('Recursive rendering detected when rendering embedded entity @entity_type(@entity_id).', array('@entity_type' => $entity_type, '@entity_id' => $id)));
+            throw new EntityEmbedRecursiveRenderingException(sprintf('Recursive rendering detected when rendering embedded %s entity %s.', $entity_type, $id));
           }
 
           // If a UUID was not used, but is available, add it to the HTML.
@@ -367,6 +367,9 @@ function _entity_embed_render_placeholders($text, $filter, $format, $langcode, $
           $entity_output = entity_embed_render_entity($entity_type, $entity, $context);
 
           $depth--;
+        }
+        else {
+          throw new EntityEmbedEntityNotFoundException(sprintf('Unable to load embedded %s entity %s.', $entity_type, $id));
         }
       }
 
