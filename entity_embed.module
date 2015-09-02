@@ -105,6 +105,19 @@ function entity_embed_filter_format_load($format_id) {
 }
 
 /**
+ * Load all embed button objects from the database.
+ *
+ * @return
+ *   An array of all loaded embed button objects, keyed by the unique IDs of the
+ *   export key.
+ */
+function entity_embed_embed_button_load_all() {
+  ctools_include('export');
+
+  return ctools_export_crud_load_all('entity_embed');
+}
+
+/**
  * Loads an embed button object from the database.
  *
  * @param $button_id
@@ -116,9 +129,8 @@ function entity_embed_filter_format_load($format_id) {
  *   has been marked as disabled, FALSE is returned.
  */
 function entity_embed_embed_button_load($button_id) {
-  ctools_include('export');
+  $embed_buttons = entity_embed_embed_button_load_all();
 
-  $embed_buttons = ctools_export_crud_load_all('entity_embed');
   return isset($embed_buttons[$button_id]) ? $embed_buttons[$button_id] : FALSE;
 }
 
@@ -154,10 +166,10 @@ function _entity_embed_preview_format_access($format) {
  */
 function _entity_embed_button_is_enabled($filter_format, $embed_button) {
   module_load_include('inc', 'ckeditor', 'includes/ckeditor.lib');
-  $button_label = $embed_button->name;
+  $button_name = $embed_button->name;
   $profile = ckeditor_get_profile($filter_format->format);
   $settings = $profile->settings;
-  if (strpos($settings['toolbar'], "'" . $button_label . "'")) {
+  if (strpos($settings['toolbar'], "'" . $button_name . "'")) {
     return TRUE;
   }
 
@@ -567,9 +579,8 @@ function entity_embed_pre_render_text_format($element) {
     return $element;
   }
 
-  ctools_include('export');
-
-  $embed_buttons = ctools_export_crud_load_all('entity_embed');
+  // Add user-defined buttons.
+  $embed_buttons = entity_embed_embed_button_load_all();
 
   $buttons = array();
 
