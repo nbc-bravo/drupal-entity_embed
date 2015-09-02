@@ -14,12 +14,16 @@
  * @ingroup forms
  */
 function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_button) {
+  $values = isset($form_state['values']) ? $form_state['values'] : array();
   $input = $_POST;
 
-  $values = isset($form_state['values']) ? $form_state['values'] : array();
+  // Set embed button element in form state, so that it can be used later in
+  // validateForm() function.
+  $form['#embed_button'] = $embed_button;
 
   // Initialize entity element with form attributes, if present.
   $entity_element = empty($values['attributes']) ? array() : $values['attributes'];
+
   // The default values are set directly from \Drupal::request()->request,
   // provided by the editor plugin opening the dialog.
   if (empty($form_state['entity_element'])) {
@@ -34,7 +38,6 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
     'data-entity-embed-display' => 'default',
     'data-entity-embed-settings' => array(),
     'data-align' => '',
-    'data-view-mode' => '',
   );
 
   if (empty($form_state['step'])) {
@@ -161,25 +164,70 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
         '#value' => $entity_element['data-entity-uuid'],
       );
 
-      $options = array();
+      $formatter_options = array();
+      $available_plugins = array();
 
-      $entity_info = entity_get_info($entity_element['data-entity-type']);
+      // Retrieve a list of formatters appropriate for the currently selected
+      // entity type.
+      $formatters = entity_embed_get_entity_field_formatters($entity_element['data-entity-type']);
 
-      foreach ($entity_info['view modes'] as $view_mode => $info) {
-        $options[$view_mode] = check_plain($info['label']);
+      if (!empty($formatters)) {
+        foreach ($formatters as $formatter => $info) {
+          $available_plugins[$info['module'] . ':' . $formatter] = $info;
+          $formatter_options[$info['module'] . ':' . $formatter] = $info['label'];
+
+          // With the File Entity module enabled, file entities require some
+          // special handling. Unlike standard field formatters which specify a
+          // list of compatible entity types and will work with any entity as
+          // long as it is the correct type, file formatters may only support
+          // files with specific MIME types.
+          if ($entity_element['data-entity-type'] == 'file' && module_exists('file_entity')) {
+            if (isset($info['file formatter']['mime types'])) {
+              if (!file_entity_match_mimetypes($info['file formatter']['mime types'], $entity->filemime)) {
+                // Remove the incompatible formatter.
+                unset($formatter_options[$info['module'] . ':' . $formatter]);
+              }
+            }
+          }
+
+          // With the File Image Formatters module enabled, image field
+          // formatters will appear twice.
+          if ($info['module'] == 'file_image_formatters' && module_exists('file_image_formatters')) {
+            // Remove the duplicate formatter.
+            unset($formatter_options[$info['module'] . ':' . $formatter]);
+          }
+        }
       }
 
-      $form['attributes']['data-view-mode'] = array(
+      // Build the list of allowed display plugins.
+      $allowed_plugins = $embed_button->display_plugins;
+
+      // If list of allowed options is empty, it means that all plugins are
+      // allowed. Else, take the intersection of allowed and available
+      // plugins.
+      $display_plugin_options = empty($allowed_plugins) ? $available_plugins : array_intersect_key($available_plugins, $allowed_plugins);
+
+      // If the currently selected display is not in the available options,
+      // use the first from the list instead. This can happen if an alter
+      // hook customizes the list based on the entity.
+      if (!isset($display_plugin_options[$entity_element['data-entity-embed-display']])) {
+        $entity_element['data-entity-embed-display'] = key($display_plugin_options);
+      }
+
+      // @todo: Abstract formatters into 'display plugins'.
+      $form['attributes']['data-entity-embed-display'] = array(
         '#type' => 'select',
         '#title' => t('Display as'),
-        '#options' => $options,
-        '#default_value' => $entity_element['data-view-mode'],
+        '#options' => $formatter_options,
+        '#default_value' => $entity_element['data-entity-embed-display'],
         '#required' => TRUE,
         '#ajax' => array(
           'callback' => 'updatePluginConfigurationForm',
           'wrapper' => 'data-entity-embed-settings-wrapper',
           'effect' => 'fade',
         ),
+        // Hide the selection if only one option is available.
+        '#access' => count($display_plugin_options) > 1,
       );
       $form['attributes']['data-entity-embed-settings'] = array(
         '#type' => 'container',
@@ -195,17 +243,45 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
         '#value' => $embed_button->button_label,
       );
 
-      // @todo: Potentially support 'display plugins' in the future.
-//      $plugin_id = !empty($values['attributes']['data-entity-embed-display']) ? $values['attributes']['data-entity-embed-display'] : $entity_element['data-entity-embed-display'];
-//      if (!empty($plugin_id)) {
-//        if (is_string($entity_element['data-entity-embed-settings'])) {
-//          $entity_element['data-entity-embed-settings'] = Json::decode($entity_element['data-entity-embed-settings'], TRUE);
-//        }
-//        $display = $this->displayPluginManager()->createInstance($plugin_id, $entity_element['data-entity-embed-settings']);
-//        $display->setContextValue('entity', $entity);
-//        $display->setAttributes($entity_element);
-//        $form['attributes']['data-entity-embed-settings'] += $display->buildConfigurationForm($form, $form_state);
-//      }
+      $plugin_id = !empty($values['attributes']['data-entity-embed-display']) ? $values['attributes']['data-entity-embed-display'] : $entity_element['data-entity-embed-display'];
+
+      // Split the formatter into separate parts.
+      $formatter_parts = explode(':', $plugin_id);
+      $formatter_module = $formatter_parts[0];
+      $formatter_name = $formatter_parts[1];
+
+      // Retrieve the settings appropriate for the currently selected formatter.
+      if (!empty($formatter_name)) {
+        if (is_string($entity_element['data-entity-embed-settings'])) {
+          $entity_element['data-entity-embed-settings'] = drupal_json_decode($entity_element['data-entity-embed-settings']);
+        }
+
+        $field_formatter_info = field_info_formatter_types($formatter_name);
+
+        // Invoke hook_field_formatter_settings_form(). We are reusing field
+        // formatter functions, but we are not working with a Field API field,
+        // so set $field accordingly. Unfortunately, the API is for $settings to
+        // be transferred via the $instance parameter, so we must mock it.
+        if (isset($field_formatter_info['module']) && ($function = ($field_formatter_info['module'] . '_field_formatter_settings_form')) && function_exists($function)) {
+          list($id, $vid, $bundle) = entity_extract_ids($entity_element['data-entity-type'], $entity);
+
+          $field = NULL;
+          $view_mode = 'default';
+          $mock_instance = array(
+            'display' => array(
+              $view_mode => array(
+                'type' => $formatter_name,
+                'settings' => $entity_element['data-entity-embed-settings'] + field_info_formatter_settings($formatter_name),
+              ),
+            ),
+            'entity_type' => $entity_element['data-entity-type'],
+            'bundle' => $bundle,
+          );
+
+          $settings = $function($field, $mock_instance, $view_mode, $form, $form_state);
+          $form['attributes']['data-entity-embed-settings'] += $settings;
+        }
+      }
 
       $filters = filter_list_format($filter_format->format);
 
@@ -307,12 +383,31 @@ function entity_embed_dialog_form_validate($form, &$form_state) {
             else {
               form_set_value($form['attributes']['data-entity-uuid'], '', $form_state);
             }
+
+            // Ensure that at least one display plugin is present before
+            // proceeding to the next step. Raise an error otherwise.
+            $embed_button = $form['#embed_button'];
+            $allowed_plugins = $embed_button->display_plugins;
+            $available_plugins = entity_embed_get_entity_field_formatters($entity_type);
+
+            $display_plugin_options = empty($allowed_plugins) ? $available_plugins : array_intersect_key($available_plugins, $allowed_plugins);
+
+            // If no plugin is available after taking the intersection,
+            // raise error. Also log an exception.
+            if (empty($display_plugin_options)) {
+              form_set_error('data-entity-id', t('No display options available for the selected entity. Please select another entity.'));
+              watchdog('entity_embed', 'No display options available for "@type:" entity "@id" while embedding using button "@button". Please ensure that at least one display plugin is allowed for this embed button which is available for this entity.', array('@type' => $entity_type, '@id' => $id, '@button' => $embed_button->admin_title), WATCHDOG_WARNING);
+            }
           }
         }
         else {
           form_set_error('data-entity-id', t('Unable to load @type entity @id.', array('@type' => $entity_type, '@id' => $title)));
         }
       }
+      break;
+
+    case 'embed':
+        // @todo: Display plugin validation.
       break;
   }
 }
@@ -398,6 +493,7 @@ function submitSelectForm(&$form, $form_state) {
  *   An associative array containing the current state of the form.
  */
 function submitEmbedForm(&$form, $form_state) {
+   // @todo: Display plugin submission.
   $values = $form_state['values'];
 
   // Display errors in form, if any.
@@ -411,7 +507,7 @@ function submitEmbedForm(&$form, $form_state) {
   else {
     // Serialize entity embed settings to JSON string.
     if (!empty($values['attributes']['data-entity-embed-settings'])) {
-      $values['attributes']['data-entity-embed-settings'] = drupal_json_encode($values['attributes']['data-entity-embed-settings']);
+      $values['attributes']['data-entity-embed-settings'] = json_encode($values['attributes']['data-entity-embed-settings'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
     }
 
     $commands[] = entity_embed_command_editor_dialog_save($values);

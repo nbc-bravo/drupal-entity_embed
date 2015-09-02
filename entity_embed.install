@@ -206,6 +206,14 @@ function entity_embed_schema() {
         'not null' => FALSE,
         'unsigned' => TRUE,
       ),
+      'display_plugins' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+        'object default' => array(),
+        'description' => 'Allowed display plugins.',
+      ),
     ),
     'unique keys' => array(
       'name' => array('name'),
@@ -230,7 +238,27 @@ function entity_embed_update_7100() {
     'not null' => TRUE,
     'serialize' => TRUE,
     'object default' => array(),
+    'initial' => serialize(array()), // Set the value of 'entity_type_bundles' to a serialized empty array for all existing embed buttons.
     'description' => 'Entity type bundles.',
+  ));
+
+  // Clear the cache_entity_embed cache.
+  cache_clear_all(NULL, 'cache_entity_embed');
+}
+
+/**
+ * Add support for restricting embedding to specific display plugins.
+ */
+function entity_embed_update_7300() {
+  // Add new columns to {entity_embed}.
+  db_add_field('entity_embed', 'display_plugins', array(
+    'type' => 'text',
+    'size' => 'big',
+    'not null' => TRUE,
+    'serialize' => TRUE,
+    'object default' => array(),
+    'initial' => serialize(array()), // Set the value of 'display_plugins' to a serialized empty array for all existing embed buttons.
+    'description' => 'Allowed display plugins.',
   ));
 
   // Clear the cache_entity_embed cache.
