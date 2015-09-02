@@ -134,7 +134,7 @@
       if (editor.ui.addButton) {
         for (var key in Drupal.settings.entity_embed.DrupalEntity_buttons) {
           var button = Drupal.settings.entity_embed.DrupalEntity_buttons[key];
-          editor.ui.addButton(button.name, {
+          editor.ui.addButton(button.id, {
             label: button.label,
             data: button,
             click: function(editor) {

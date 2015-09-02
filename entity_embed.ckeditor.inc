@@ -19,9 +19,7 @@ function entity_embed_ckeditor_plugin() {
   );
 
   // Add user-defined buttons.
-  ctools_include('export');
-
-  $embed_buttons = ctools_export_crud_load_all('entity_embed');
+  $embed_buttons = entity_embed_embed_button_load_all();
 
   $buttons = array();
 
