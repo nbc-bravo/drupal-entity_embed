@@ -1,4 +1,15 @@
-(function ($) {
+/**
+ * @file
+ * Positioning extensions for dialogs.
+ */
+
+/**
+ * Triggers when content inside a dialog changes.
+ *
+ * @event dialogContentResize
+ */
+
+(function ($, Drupal, debounce, displace) {
 
   "use strict";
 
@@ -11,13 +22,21 @@
    * This is used as a window resize and scroll callback to reposition the
    * jQuery UI dialog. Although not a built-in jQuery UI option, this can
    * be disabled by setting autoResize: false in the options array when creating
-   * a new Drupal.dialog().
+   * a new {@link Drupal.dialog}.
+   *
+   * @function Drupal.dialog~resetSize
+   *
+   * @param {jQuery.Event} event
+   *
+   * @fires event:dialogContentResize
    */
   function resetSize(event) {
     var positionOptions = ['width', 'height', 'minWidth', 'minHeight', 'maxHeight', 'maxWidth', 'position'];
     var adjustedOptions = {};
     var windowHeight = $(window).height();
-    var option, optionValue, adjustedValue;
+    var option;
+    var optionValue;
+    var adjustedValue;
     for (var n = 0; n < positionOptions.length; n++) {
       option = positionOptions[n];
       optionValue = event.data.settings[option];
@@ -25,7 +44,7 @@
         // jQuery UI does not support percentages on heights, convert to pixels.
         if (typeof optionValue === 'string' && /%$/.test(optionValue) && /height/i.test(option)) {
           // Take offsets in account.
-          windowHeight -= Drupal.displace.offsets.top + Drupal.displace.offsets.bottom;
+          windowHeight -= displace.offsets.top + displace.offsets.bottom;
           adjustedValue = parseInt(0.01 * parseInt(optionValue, 10) * windowHeight, 10);
           // Don't force the dialog to be bigger vertically than needed.
           if (option === 'height' && event.data.$element.parent().outerHeight() < adjustedValue) {
@@ -44,9 +63,15 @@
 
   /**
    * Position the dialog's center at the center of displace.offsets boundaries.
+   *
+   * @function Drupal.dialog~resetPosition
+   *
+   * @param {object} options
+   *
+   * @return {object}
    */
   function resetPosition(options) {
-    var offsets = Drupal.displace.offsets;
+    var offsets = displace.offsets;
     var left = offsets.left - offsets.right;
     var top = offsets.top - offsets.bottom;
 
@@ -61,7 +86,7 @@
 
   $(window).on({
     'dialog:aftercreate': function (event, dialog, $element, settings) {
-      var autoResize = Drupal.debounce(resetSize, 20);
+      var autoResize = debounce(resetSize, 20);
       var eventData = {settings: settings, $element: $element};
       if (settings.autoResize === true || settings.autoResize === 'true') {
         $element
@@ -78,4 +103,4 @@
     }
   });
 
-})(jQuery);
+})(jQuery, Drupal, Drupal.debounce, Drupal.displace);

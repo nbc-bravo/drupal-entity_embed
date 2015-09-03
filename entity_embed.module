@@ -267,6 +267,22 @@ function entity_embed_autocomplete_entity($filter_format, $embed_button, $string
 }
 
 /** 
+ * Implements hook_module_implements_alter(). 
+ */
+function entity_embed_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'library_alter') {
+    // Move hook_library_alter() to the end of the list in order to run after
+    // jquery_update.
+    // module_implements() iterates through $implementations with a foreach loop
+    // which PHP iterates in the order that the items were added, so to move an
+    // item to the end of the array, we remove it and then add it.
+    $group = $implementations ['entity_embed'];
+    unset($implementations ['entity_embed']);
+    $implementations ['entity_embed'] = $group;
+  }
+}
+
+/** 
  * Implements hook_library(). 
  */
 function entity_embed_library() {
@@ -353,7 +369,55 @@ function entity_embed_library() {
     ),
   );
 
+  // Register libraries on behalf of seven.theme.
+  if (drupal_theme_access('seven')) {
+    $libraries['seven.drupal.dialog'] = array(
+      'title' => 'Seven Drupal Dialog',
+      'website' => 'http://www.drupal.org',
+      'version' => VERSION,
+      'css' => array(
+        drupal_get_path('module', 'entity_embed') . '/themes/seven/css/components/dialog.theme.css' => array(),
+        drupal_get_path('module', 'entity_embed') . '/themes/seven/css/components/buttons.css' => array(),
+      ),
+    );
+
+    $libraries['seven.jquery.ui'] = array(
+      'title' => 'Seven jQuery UI',
+      'website' => 'http://www.drupal.org',
+      'version' => VERSION,
+      'css' => array(
+        drupal_get_path('module', 'entity_embed') . '/themes/seven/css/components/jquery.ui/theme.css' => array(
+          'weight' => -1,
+        ),
+      ),
+    );
+  }
+
   return $libraries;
+}
+
+/**
+ * Implements hook_library_alter().
+ */
+function entity_embed_library_alter(&$libraries, $module) {
+  // Alter libraries on behalf of seven.theme.
+  if (drupal_theme_access('seven')) {
+    // Replace the default jQuery UI theme CSS with custom CSS for seven.theme.
+    if ($module == 'system' && isset($libraries['ui'])) {
+      $path = 'misc/ui/jquery.ui.theme.css';
+      unset($libraries['ui']['css'][$path]);
+
+      $libraries['ui']['dependencies'][] = array('entity_embed', 'seven.jquery.ui');
+    }
+
+    // Replace the default dialog theme CSS with custom CSS for seven.theme.
+    if ($module == 'entity_embed' && isset($libraries['drupal.dialog'])) {
+      $path = drupal_get_path('module', 'entity_embed') . '/js/dialog/dialog.theme.css';
+      unset($libraries['drupal.dialog']['css'][$path]);
+
+      $libraries['drupal.dialog']['dependencies'][] = array('entity_embed', 'seven.drupal.dialog');
+    }
+  }
 }
 
 /**
