@@ -35,7 +35,7 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
     'data-entity-type' => $embed_button->entity_type,
     'data-entity-uuid' => '',
     'data-entity-id' => '',
-    'data-entity-embed-display' => 'default',
+    'data-entity-embed-display' => 'entityreference:entityreference_entity_view',
     'data-entity-embed-settings' => array(),
     'data-align' => '',
   );
@@ -212,6 +212,12 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
       // hook customizes the list based on the entity.
       if (!isset($display_plugin_options[$entity_element['data-entity-embed-display']])) {
         $entity_element['data-entity-embed-display'] = key($display_plugin_options);
+      }
+
+      // The default display plugin has been deprecated by the rendered entity
+      // field formatter.
+      if ($entity_element['data-entity-embed-display'] === 'default') {
+        $entity_element['data-entity-embed-display'] = 'entityreference:entityreference_entity_view';
       }
 
       // @todo: Abstract formatters into 'display plugins'.

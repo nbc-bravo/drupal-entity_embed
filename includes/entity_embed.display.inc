@@ -22,7 +22,7 @@
 function entity_embed_render_entity($entity_type, $entity, array $context = array()) {
   // Support the deprecated view-mode data attribute.
   if (isset($context['data-view-mode']) && !isset($context['data-entity-embed-display']) && !isset($context['data-entity-embed-settings'])) {
-    $context['data-entity-embed-display'] = 'default';
+    $context['data-entity-embed-display'] = 'entityreference:entityreference_entity_view';
     $context['data-entity-embed-settings'] = array('view_mode' => $context['data-view-mode']);
   }
 
@@ -32,9 +32,15 @@ function entity_embed_render_entity($entity_type, $entity, array $context = arra
   $context += array(
     'data-entity-id' => $id,
     'data-entity-type' => $entity_type,
-    'data-entity-embed-display' => 'default',
+    'data-entity-embed-display' => 'entityreference:entityreference_entity_view',
     'data-entity-embed-settings' => array(),
   );
+
+  // The default display plugin has been deprecated by the rendered entity
+  // field formatter.
+  if ($context['data-entity-embed-display'] === 'default') {
+    $context['data-entity-embed-display'] = 'entityreference:entityreference_entity_view';
+  }
 
   // Allow modules to alter the entity prior to embed rendering.
   drupal_alter(array("{$context['data-entity-type']}_embed_context", 'entity_embed_context'), $context, $entity);
@@ -77,12 +83,6 @@ function render_entity_embed_display_plugin($entity_type, $entity, $plugin_id, a
   // Check if the display plugin is accessible.
   if (!entity_access('view', $entity_type, $entity)) {
     return array();
-  }
-
-  // Fallback to rendering the entity when the 'default' plugin is specified.
-  if ($plugin_id == 'default') {
-    $render = entity_view($entity_type, array($entity), $context['data-entity-embed-settings']['view_mode'], $context['data-langcode']);
-    return $render;
   }
 
   // Split the formatter into separate parts.

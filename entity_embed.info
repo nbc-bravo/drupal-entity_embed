@@ -7,6 +7,7 @@ dependencies[] = ctools
 dependencies[] = ckeditor
 dependencies[] = dialog
 dependencies[] = entity
+dependencies[] = entityreference
 dependencies[] = filter
 dependencies[] = jquery_update
 

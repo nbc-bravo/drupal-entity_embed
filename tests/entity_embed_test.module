@@ -14,8 +14,12 @@ function entity_embed_test_entity_embed_context_alter(&$context, $entity) {
     return;
   }
 
-  // Change the view mode to 'teaser'.
-  $context['data-entity-embed-settings']['view_mode'] = 'teaser';
+  // Force to use 'Label' plugin.
+  $context['data-entity-embed-display'] = 'entityreference:entityreference_label';
+  $context['data-entity-embed-settings'] = array('link' => 1);
+
+  // Set title of the entity.
+//  $entity->title = 'Title set by hook_entity_embed_context_alter';
 }
 
 /**

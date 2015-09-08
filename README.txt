@@ -30,6 +30,7 @@ Contributed modules
  * CKEditor - The latest development release.
  * Dialog
  * Entity
+ * Entity Reference
  * jQuery Update - Configured to use jQuery 1.7 or higher.
 
 Libraries
@@ -85,3 +86,17 @@ Embed by UUID (recommended: requires the UUID module):
 
 Embed by ID (not recommended):
 <div data-entity-type="node" data-entity-id="1" data-view-mode="teaser" />
+
+Display Plugins
+<div data-entity-type="node" data-entity-id="1" data-entity-embed-display="entityreference:entityreference_entity_view" data-entity-embed-settings='{"view_mode":"teaser"}' />
+
+A more advanced use for embedding entities uses an entity embed display plugin,
+provided in the data-entity-embed-display attribute.
+
+Configuration for the display plugin can be provided by using a
+data-entity-embed-settings attribute, which contains a JSON-encoded array value.
+Note that care must be used to use single quotes around the attribute value
+since JSON-encoded arrays typically contain double quotes.
+
+The above example renders the entity using the entityreference_entity_view
+formatter from the Entity Reference module, using the teaser view mode.
