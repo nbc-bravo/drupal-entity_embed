@@ -40,12 +40,16 @@
         $dialog.dialog('widget').trigger('focus');
       }
 
-      var originalClose = settings.dialog.close;
-      // Overwrite the close method to remove the dialog on closing.
-      settings.dialog.close = function (event) {
-        originalClose.apply(settings.dialog, arguments);
-        $(event.target).remove();
-      };
+      // @todo: Verify that this was the correct change after
+      // http://drupal.org/node/2498915 is fixed in core.
+      if (settings.hasOwnProperty('dialog')) {
+        var originalClose = settings.dialog.close;
+        // Overwrite the close method to remove the dialog on closing.
+        settings.dialog.close = function (event) {
+          originalClose.apply(settings.dialog, arguments);
+          $(event.target).remove();
+        };
+      }
     },
 
     /**
