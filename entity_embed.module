@@ -80,12 +80,12 @@ function entity_embed_help($path, $arg) {
       $output .= '<li>' . t('Enable the entity-embed filter <em>Display embedded entities</em> for the desired text formats from the <a href="@filter">Text Formats configuration page</a>.', array('@filter' => url('admin/config/content/formats'))) . '</li>';
       $output .= '<li>' . t('If the <em>Limit allowed HTML tags</em> filter is enabled, add <code>&lt;drupal-entity&gt;</code> to the <em>Allowed HTML tags</em>') . '</li>';
       $output .= '<li>' . t('Optionally enable the filter-align filter <em>Align embedded entities</em> to allow positioning of embedded entities.') . '</li>';
-      $output .= '<li>' . t('To enable the WYSIWYG plugin, move the entity-embed <code>E</code> button into the Active toolbar for the desired text formats from the <a href="@ckeditor">CKEditor configuration page</a>.', array('@ckeditor' => url('admin/config/content/ckeditor'))) . '</li>';
+      $output .= '<li>' . t('To enable the WYSIWYG plugin, move the entity-embed <code>E</code> button into the Active toolbar for the desired text formats from the <a href="@formats">text formats configuration page</a>.', array('@formats' => url('admin/config/content/formats'))) . '</li>';
       $output .= '</ol>';
       return $output;
 
     case 'admin/config/content/embed-button':
-      return '<p>' . t("Embed buttons define the buttons that can be added to CKEditor's toolbar. All buttons correspond to the selcted entity type, although a particular entity type can have more than one button. After you've created the desired buttons, go to <a href='@ckeditor'>CKEditor configuration</a> page to add them to CKEditor's toolbar for the desired text formats.", array('@ckeditor' => url('admin/config/content/ckeditor'))) . '</p>';
+      return '<p>' . t("Embed buttons define the buttons that can be added to CKEditor's toolbar. All buttons correspond to the selcted entity type, although a particular entity type can have more than one button. After you've created the desired buttons, go to <a href='@formats'>text formats configuration</a> page to add them to CKEditor's toolbar for the desired text formats.", array('@formats' => url('admin/config/content/formats'))) . '</p>';
   }
 }
 
@@ -168,12 +168,16 @@ function _entity_embed_preview_format_access($format) {
  *   The access result.
  */
 function _entity_embed_button_is_enabled($filter_format, $embed_button) {
-  module_load_include('inc', 'ckeditor', 'includes/ckeditor.lib');
+  editor_format_ensure_additional_properties($filter_format);
+
   $button_name = $embed_button->name;
-  $profile = ckeditor_get_profile($filter_format->format);
-  $settings = $profile->settings;
-  if (strpos($settings['toolbar'], "'" . $button_name . "'")) {
-    return TRUE;
+
+  foreach ($filter_format->editor_settings['toolbar'] as $row) {
+    foreach ($row as $button_group) {
+      if (in_array($button_name, $button_group['items'])) {
+        return TRUE;
+      }
+    }
   }
 
   return FALSE;
@@ -523,13 +527,15 @@ function entity_embed_pre_render_text_format($element) {
  *   A string containing a URL that may be used to access the file.
  */
 function _entity_embed_button_image($fid) {
+  $url = file_create_url(drupal_get_path('module', 'entity_embed') . '/js/plugins/drupalentity/entity.png');
+
   if ($fid) {
-    $image = file_load($fid);
-    return file_create_url($image->uri);
+    if ($file = file_load($fid)) {
+      $url = file_create_url($file->uri);
+    }
   }
-  else {
-    return file_create_url(drupal_get_path('module', 'entity_embed') . '/js/plugins/drupalentity/entity.png');
-  }
+
+  return $url;
 }
 
 /**

@@ -77,7 +77,7 @@
           };
 
           // Open the entity embed dialog for corresponding EmbedButton.
-          Drupal.entityEmbed.openDialog(editor, Drupal.settings.basePath + 'entity-embed/dialog/entity-embed/' + Drupal.settings.ckeditor.elements[editor.name] + '/' + embed_button_id + '?_format=drupal_dialog', existingValues, saveCallback, dialogSettings);
+          Drupal.entityEmbed.openDialog(editor, Drupal.settings.basePath + 'entity-embed/dialog/entity-embed/' + editor.config.drupal.format + '/' + embed_button_id + '?_format=drupal_dialog', existingValues, saveCallback, dialogSettings);
         }
       });
 
@@ -108,7 +108,7 @@
           // Use the Ajax framework to fetch the HTML, so that we can retrieve
           // out-of-band assets (JS, CSS...).
           new Drupal.ajax($element.attr('id'), $element, {
-            url: Drupal.settings.basePath + 'entity-embed/preview/' + Drupal.settings.ckeditor.elements[editor.name] + '?' + $.param({
+            url: Drupal.settings.basePath + 'entity-embed/preview/' + editor.config.drupal.format + '?' + $.param({
               value: element.getOuterHtml()
             }),
             progress: {type: 'none'},

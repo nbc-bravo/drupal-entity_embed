@@ -4,7 +4,7 @@ package = Media
 core = 7.x
 
 dependencies[] = ctools
-dependencies[] = ckeditor
+dependencies[] = editor_ckeditor
 dependencies[] = dialog
 dependencies[] = entity
 dependencies[] = entityreference
