@@ -103,6 +103,11 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
           '#default_value' => $entity_element['data-entity-id'],
           '#required' => TRUE,
           '#description' => t('Select a file to embed using the media browser.'),
+          '#media_options' => array(
+            'global' => array(
+              'types' => isset($embed_button->entity_type_bundles) ? $embed_button->entity_type_bundles : array(),
+            ),
+          ),
         );
       }
 
