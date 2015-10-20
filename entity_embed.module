@@ -104,37 +104,174 @@ function entity_embed_help($path, $arg) {
  */
 function entity_embed_filter_format_load($format_id) {
   $formats = filter_formats();
+
   return isset($formats[$format_id]) ? $formats[$format_id] : FALSE;
 }
 
 /**
- * Load all embed button objects from the database.
+ * Creates a new embed button object.
+ *
+ * @param $set_defaults
+ *   If TRUE, which is the default, then default values will be retrieved
+ *   from schema fields and set on the object.
  *
  * @return
- *   An array of all loaded embed button objects, keyed by the unique IDs of the
- *   export key.
+ *   An embed button object populated with default values.
  */
-function entity_embed_embed_button_load_all() {
+function entity_embed_embed_button_new($set_defaults = TRUE) {
   ctools_include('export');
 
-  return ctools_export_crud_load_all('entity_embed');
+  return ctools_export_new_object('entity_embed', $set_defaults);
 }
 
 /**
  * Loads an embed button object from the database.
  *
- * @param $button_id
- *   The button ID.
+ * @param $name
+ *   The name of the button to load.
  *
  * @return
- *   A fully-populated embed button object, if the requested button exists and
- *   is enabled. If the button does not exist, or exists in the database but
- *   has been marked as disabled, FALSE is returned.
+ *   The loaded button object or FALSE if the button is not found.
  */
-function entity_embed_embed_button_load($button_id) {
-  $embed_buttons = entity_embed_embed_button_load_all();
+function entity_embed_embed_button_load($name) {
+  ctools_include('export');
 
-  return isset($embed_buttons[$button_id]) ? $embed_buttons[$button_id] : FALSE;
+  $result = ctools_export_load_object('entity_embed', 'names', array($name));
+
+  return isset($result[$name]) ? $result[$name] : FALSE;
+}
+
+/**
+ * Loads multiple embed button objects from the database.
+ *
+ * @param $names
+ *   An array of button names to load.
+ *
+ * @return
+ *   An array of loaded button objects.
+ */
+function entity_embed_embed_button_load_multiple(array $names) {
+  ctools_include('export');
+
+  $results = ctools_export_load_object('entity_embed', 'names', $names);
+
+  // Ensure no empty results are returned.
+  return array_filter($results);
+}
+
+/**
+ * Load all embed button objects from the database.
+ *
+ * @param $reset
+ *   If TRUE, the static cache of all objects will be flushed prior to
+ *   loading all. This can be important on listing pages where items
+ *   might have changed on the page load.
+ *
+ * @return
+ *   An array of all loaded embed button objects, keyed by the unique IDs of the
+ *   export key.
+ */
+function entity_embed_embed_button_load_all($reset = FALSE) {
+  ctools_include('export');
+
+  if ($reset) {
+    ctools_export_load_object_reset('entity_embed');
+  }
+
+  return ctools_export_load_object('entity_embed', 'all');
+}
+
+/**
+ * Saves an embed button object to the database.
+ *
+ * @param $embed_button
+ *   The embed button to save.
+ */
+function entity_embed_embed_button_save($embed_button) {
+  ctools_include('export');
+
+  $new_button_icon_fid = $embed_button->button_icon_fid;
+
+  // Find the original button settings to see if they have been changed.
+  if ($original = entity_embed_embed_button_load($embed_button->name)) {
+    $old_button_icon_fid = $original->button_icon_fid;
+
+    // If the button icon has changed, remove file usage from the old icon.
+    if (!empty($old_button_icon_fid) && $old_button_icon_fid != $new_button_icon_fid) {
+      if ($file = file_load($old_button_icon_fid)) {
+        // Mark the old icon file as temporary since it is no longer needed.
+        if ($file->status !== 0) {
+          $file->status = 0;
+          file_save($file);
+        }
+
+        file_usage_delete($file, 'entity_embed', $embed_button->name, 1);
+      }
+    }
+  }
+
+  // Add file usage information to the button icon if it is new.
+  if ($new_button_icon_fid) {
+    if ($file = file_load($new_button_icon_fid)) {
+      // Mark the file as permanent so it won't be cleaned up by the system.
+      if ($file->status !== FILE_STATUS_PERMANENT) {
+        $file->status = FILE_STATUS_PERMANENT;
+        file_save($file);
+      }
+
+      $usage = file_usage_list($file);
+
+      // Icons can only be used once per button.
+      if (empty($usage['entity_embed'][$embed_button->name][1])) {
+        file_usage_add($file, 'entity_embed', $embed_button->name, 1);
+      }
+    }
+  }
+
+  if ($embed_button->export_type & EXPORT_IN_DATABASE) {
+    // Existing record.
+    $update = array('cid');
+  }
+  else {
+    // New record.
+    $update = array();
+    $embed_button->export_type = EXPORT_IN_DATABASE;
+  }
+
+  // Reset the ctools object cache so that the changes are picked up.
+  ctools_export_load_object_reset('entity_embed');
+
+  return drupal_write_record('entity_embed', $embed_button, $update);
+}
+
+/**
+ * Deletes an embed button object from the database.
+ *
+ * @param $embed_button
+ *   The embed button to delete or the button cid.
+ */
+function entity_embed_embed_button_delete($embed_button) {
+  ctools_include('export');
+
+  $button_icon_fid = $embed_button->button_icon_fid;
+
+  // Remove file usage from the associated button icon.
+  if ($button_icon_fid) {
+    if ($file = file_load($button_icon_fid)) {
+      // Mark the file as temporary since it is no longer needed.
+      if ($file->status !== 0) {
+        $file->status = 0;
+        file_save($file);
+      }
+
+      file_usage_delete($file, 'entity_embed', $embed_button->name, 1);
+    }
+  }
+
+  $value = is_object($embed_button) ? $embed_button->cid : $embed_button;
+  db_delete('entity_embed')
+    ->condition('cid', $value)
+    ->execute();
 }
 
 /**
