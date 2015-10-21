@@ -296,9 +296,9 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
 
       $filters = filter_list_format($filter_format->format);
 
-      // When Drupal core's filter_align is being used, the text editor may
-      // offer the ability to change the alignment.
-      if (isset($entity_element['data-align']) && isset($filters['filter_align']) && $filters['filter_align']->status) {
+      // When Editor's editor_align is being used, the text editor may offer the
+      // ability to change the alignment.
+      if (isset($entity_element['data-align']) && isset($filters['editor_align']) && $filters['editor_align']->status) {
         $form['attributes']['data-align'] = array(
           '#title' => t('Align'),
           '#type' => 'radios',

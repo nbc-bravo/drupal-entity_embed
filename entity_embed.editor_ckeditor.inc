@@ -52,9 +52,6 @@ function entity_embed_editor_ckeditor_plugins() {
  * Implements hook_editor_ckeditor_css_alter().
  */
 function entity_embed_editor_ckeditor_css_alter(array &$css, $format) {
-  // Add theme-independent styles for aligning content.
-  $css[] = drupal_get_path('module', 'entity_embed') . '/css/entity_embed.css';
-
   // Add styles for handling contextual links.
   if (module_exists('contextual')) {
     $css[] = drupal_get_path('module', 'contextual') . '/contextual.css';

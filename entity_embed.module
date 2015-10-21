@@ -79,7 +79,7 @@ function entity_embed_help($path, $arg) {
       $output .= '<li>' . t('Configure the jQuery Update module to use jQuery 1.7 or higher by visiting the <a href="@jquery_update">jQuery Update configuration page</a>.', array('@jquery_update' => url('admin/config/development/jquery_update'))) . '</li>';
       $output .= '<li>' . t('Enable the entity-embed filter <em>Display embedded entities</em> for the desired text formats from the <a href="@filter">Text Formats configuration page</a>.', array('@filter' => url('admin/config/content/formats'))) . '</li>';
       $output .= '<li>' . t('If the <em>Limit allowed HTML tags</em> filter is enabled, add <code>&lt;drupal-entity&gt;</code> to the <em>Allowed HTML tags</em>') . '</li>';
-      $output .= '<li>' . t('Optionally enable the filter-align filter <em>Align embedded entities</em> to allow positioning of embedded entities.') . '</li>';
+      $output .= '<li>' . t('Optionally enable the editor-align filter <em>Align images</em> to allow positioning of embedded entities.') . '</li>';
       $output .= '<li>' . t('To enable the WYSIWYG plugin, move the entity-embed <code>E</code> button into the Active toolbar for the desired text formats from the <a href="@formats">text formats configuration page</a>.', array('@formats' => url('admin/config/content/formats'))) . '</li>';
       $output .= '</ol>';
       return $output;
@@ -444,13 +444,6 @@ function entity_embed_filter_info() {
     'js settings callback' => '_entity_embed_entity_embed_js_settings',
   );
 
-  $filters['filter_align'] = array(
-    'title' => t('Align embedded entities'),
-    'description' => t('Allows embedded entities to be aligned.'),
-    'process callback' => '_entity_embed_filter_align',
-    'tips callback' => '_entity_embed_filter_align_tips',
-  );
-
   return $filters;
 }
 
@@ -566,69 +559,6 @@ function _entity_embed_render_placeholders($text, $filter, $format, $langcode, $
   }
 
   return $result;
-}
-
-/**
- * Implements callback_filter_tips().
- *
- * Provides help for the entity embed's align filter.
- */
-function _entity_embed_filter_align_tips($filter, $format, $long = FALSE) {
-  if ($long) {
-    return t('
-        <p>You can align images, videos, blockquotes and so on to the left, right or center. Examples:</p>
-        <ul>
-          <li>Align an image to the left: <code>&lt;img src="" data-align="left" /&gt;</code></li>
-          <li>Align an image to the center: <code>&lt;img src="" data-align="center" /&gt;</code></li>
-          <li>Align an image to the right: <code>&lt;img src="" data-align="right" /&gt;</code></li>
-          <li>… and you can apply this to other elements as well: <code>&lt;video src="" data-align="center" /&gt;</code></li>
-        </ul>');
-  }
-  else {
-    return t('You can align images (<code>data-align="center"</code>), but also videos, blockquotes, and so on.');
-  }
-}
-
-/**
- * Implements callback_filter_process().
- *
- * Aligns embedded entities.
- */
-function _entity_embed_filter_align($text) {
-  $result = $text;
-
-  if (stristr($text, 'data-align') !== FALSE) {
-    $dom = entity_embed_dom_load_html($text);
-    $xpath = new \DOMXPath($dom);
-    foreach ($xpath->query('//*[@data-align]') as $node) {
-      // Read the data-align attribute's value, then delete it.
-      $align = $node->getAttribute('data-align');
-      $node->removeAttribute('data-align');
-
-      // If one of the allowed alignments, add the corresponding class.
-      if (in_array($align, array('left', 'center', 'right'))) {
-        $classes = $node->getAttribute('class');
-        $classes = (strlen($classes) > 0) ? explode(' ', $classes) : array();
-        $classes[] = 'align-' . $align;
-        $node->setAttribute('class', implode(' ', $classes));
-      }
-    }
-
-    $result = entity_embed_serialize($dom);
-  }
-
-  return $result;
-}
-
-/**
- * Implements hook_page_build().
- */
-function entity_embed_page_build(&$page) {
-  $page['page_bottom']['entity_embed']['#attached']['css'] = array(
-    drupal_get_path('module', 'entity_embed') . '/css/entity_embed.css' => array(
-      'every_page' => TRUE,
-    ),
-  );
 }
 
 /**

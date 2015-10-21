@@ -44,8 +44,6 @@ INSTALLATION
   '/admin/config/content/formats'.
 * If the 'Limit allowed HTML tags' filter is enabled, add '<drupal-entity>' to
   the 'Allowed HTML tags'.
-* Optionally enable the filter-align filter 'Align embedded entities' to allow
-  positioning of embedded entities.
 * To enable the WYSIWYG plugin, move the entity-embed 'E' button into the
   Active toolbar for the desired text formats from the Text Formats
   configuration page: '/admin/config/content/formats'.
