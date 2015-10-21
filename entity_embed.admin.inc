@@ -521,7 +521,7 @@ function submitEmbedForm(&$form, $form_state) {
       $values['attributes']['data-entity-embed-settings'] = json_encode($values['attributes']['data-entity-embed-settings'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
     }
 
-    $commands[] = entity_embed_command_editor_dialog_save($values);
+    $commands[] = editor_command_editor_dialog_save($values);
     $commands[] = dialog_command_close_modal_dialog();
   }
 
