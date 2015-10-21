@@ -441,6 +441,7 @@ function entity_embed_filter_info() {
     'process callback' => '_entity_embed_render_placeholders',
     'cache' => FALSE,
     'tips callback' => '_entity_embed_render_placeholders_tips',
+    'js settings callback' => '_entity_embed_entity_embed_js_settings',
   );
 
   $filters['filter_align'] = array(
@@ -470,6 +471,34 @@ function _entity_embed_render_placeholders_tips($filter, $format, $long = FALSE)
   else {
     return t('You can embed entities.');
   }
+}
+
+/**
+ * Implements callback_filter_js_settings().
+ *
+ * Entity Embed JS settings callback: return settings for JavaScript.
+ */
+function _entity_embed_entity_embed_js_settings($filter, $format) {
+  // Add user-defined buttons.
+  $embed_buttons = entity_embed_embed_button_load_all();
+
+  $buttons = array();
+
+  foreach ($embed_buttons as $embed_button) {
+    $buttons[$embed_button->name] = array(
+      'id' => check_plain($embed_button->name),
+      'name' => check_plain($embed_button->admin_title),
+      'label' => check_plain($embed_button->admin_title),
+      'entity_type' => check_plain($embed_button->entity_type),
+      'image' => check_plain(_entity_embed_button_image($embed_button->button_icon_fid)),
+    );
+  }
+
+  return array(
+    'DrupalEntity_dialogTitleAdd' => t('Insert entity'),
+    'DrupalEntity_dialogTitleEdit' => t('Edit entity'),
+    'DrupalEntity_buttons' => $buttons,
+  );
 }
 
 /**
@@ -600,58 +629,6 @@ function entity_embed_page_build(&$page) {
       'every_page' => TRUE,
     ),
   );
-}
-
-/**
- * Implements hook_element_info_alter().
- */
-function entity_embed_element_info_alter(&$types) {
-  $types['text_format']['#pre_render'][] = 'entity_embed_pre_render_text_format';
-}
-
-/**
- * Process text format elements to load and attach assets.
- */
-function entity_embed_pre_render_text_format($element) {
-  if (!isset($element['format'])) {
-    return $element;
-  }
-
-  $field = &$element['value'];
-
-  if (!isset($field['#value'])) {
-    return $element;
-  }
-
-  // Add user-defined buttons.
-  $embed_buttons = entity_embed_embed_button_load_all();
-
-  $buttons = array();
-
-  foreach ($embed_buttons as $embed_button) {
-    $buttons[$embed_button->name] = array(
-      'id' => check_plain($embed_button->name),
-      'name' => check_plain($embed_button->admin_title),
-      'label' => check_plain($embed_button->admin_title),
-      'entity_type' => check_plain($embed_button->entity_type),
-      'image' => check_plain(_entity_embed_button_image($embed_button->button_icon_fid)),
-    );
-  }
-
-  $element['#attached']['library'][] = array('dialog', 'drupal.dialog.ajax');
-
-  $element['#attached']['js'][] = array(
-    'data' => array(
-      'entity_embed' => array(
-        'DrupalEntity_dialogTitleAdd' => t('Insert entity'),
-        'DrupalEntity_dialogTitleEdit' => t('Edit entity'),
-        'DrupalEntity_buttons' => $buttons,
-      ),
-    ),
-    'type' => 'setting',
-  );
-
-  return $element;
 }
 
 /**

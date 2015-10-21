@@ -132,8 +132,8 @@
 
       // Register the toolbar buttons.
       if (editor.ui.addButton) {
-        for (var key in Drupal.settings.entity_embed.DrupalEntity_buttons) {
-          var button = Drupal.settings.entity_embed.DrupalEntity_buttons[key];
+        for (var key in Drupal.settings.editor.formats[editor.config.drupal.format].filterSettings.DrupalEntity_buttons) {
+          var button = Drupal.settings.editor.formats[editor.config.drupal.format].filterSettings.DrupalEntity_buttons[key];
           editor.ui.addButton(button.id, {
             label: button.label,
             data: button,
