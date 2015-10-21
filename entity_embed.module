@@ -14,9 +14,6 @@ require_once dirname(__FILE__) . '/includes/entity_embed.commands.inc';
 // Display functions.
 require_once dirname(__FILE__) . '/includes/entity_embed.display.inc';
 
-// File usage tracking.
-require_once dirname(__FILE__) . '/includes/entity_embed.file_usage.inc';
-
 /**
  * Implements hook_permission().
  */
