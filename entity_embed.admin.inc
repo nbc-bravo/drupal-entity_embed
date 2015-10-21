@@ -51,7 +51,7 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
   }
 
   $form['#tree'] = TRUE;
-  $form['#attached']['library'][] = array('entity_embed', 'drupal.editor.dialog');
+  $form['#attached']['library'][] = array('editor', 'drupal.editor.dialog');
   $form['#prefix'] = '<div id="entity-embed-dialog-form">';
   $form['#suffix'] = '</div>';
 
