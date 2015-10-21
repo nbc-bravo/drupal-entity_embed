@@ -408,29 +408,6 @@ function entity_embed_autocomplete_entity($filter_format, $embed_button, $string
   return drupal_json_output($matches);
 }
 
-/** 
- * Implements hook_library(). 
- */
-function entity_embed_library() {
-  $libraries['drupal.editor.dialog'] = array(
-    'title' => 'Drupal Editor Dialog',
-    'website' => 'http://www.drupal.org',
-    'version' => VERSION,
-    'js' => array(
-      drupal_get_path('module', 'entity_embed') . '/js/editor/editor.dialog.js' => array(
-        'weight' => 2,
-      ),
-    ),
-    'dependencies' => array(
-      array('system', 'jquery'),
-      array('system', 'drupal.ajax'),
-      array('dialog', 'drupal.dialog'),
-    ),
-  );
-
-  return $libraries;
-}
-
 /**
  * Implements hook_filter_info().
  */
