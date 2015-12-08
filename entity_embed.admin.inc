@@ -204,7 +204,7 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
         }
       }
 
-      // Build the list of allowed display plugins.
+      // Build the list of allowed Entity Embed Display plugins.
       $allowed_plugins = $embed_button->display_plugins;
 
       // If list of allowed options is empty, it means that all plugins are
@@ -219,8 +219,8 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
         $entity_element['data-entity-embed-display'] = key($display_plugin_options);
       }
 
-      // The default display plugin has been deprecated by the rendered entity
-      // field formatter.
+      // The default Entity Embed Display plugin has been deprecated by the
+      // rendered entity field formatter.
       if ($entity_element['data-entity-embed-display'] === 'default') {
         $entity_element['data-entity-embed-display'] = 'entityreference:entityreference_entity_view';
       }
@@ -395,8 +395,8 @@ function entity_embed_dialog_form_validate($form, &$form_state) {
               form_set_value($form['attributes']['data-entity-uuid'], '', $form_state);
             }
 
-            // Ensure that at least one display plugin is present before
-            // proceeding to the next step. Raise an error otherwise.
+            // Ensure that at least one Entity Embed Display plugin is present
+            // before proceeding to the next step. Rasie an error otherwise.
             $embed_button = $form['#embed_button'];
             $allowed_plugins = $embed_button->display_plugins;
             $available_plugins = entity_embed_get_entity_field_formatters($entity_type);
@@ -407,7 +407,7 @@ function entity_embed_dialog_form_validate($form, &$form_state) {
             // raise error. Also log an exception.
             if (empty($display_plugin_options)) {
               form_set_error('data-entity-id', t('No display options available for the selected entity. Please select another entity.'));
-              watchdog('entity_embed', 'No display options available for "@type:" entity "@id" while embedding using button "@button". Please ensure that at least one display plugin is allowed for this embed button which is available for this entity.', array('@type' => $entity_type, '@id' => $id, '@button' => $embed_button->admin_title), WATCHDOG_WARNING);
+              watchdog('entity_embed', 'No display options available for "@type:" entity "@id" while embedding using button "@button". Please ensure that at least one Entity Embed Display plugin is allowed for this embed button which is available for this entity.', array('@type' => $entity_type, '@id' => $id, '@button' => $embed_button->admin_title), WATCHDOG_WARNING);
             }
           }
         }

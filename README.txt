@@ -87,9 +87,9 @@ Embed by ID (not recommended):
 
 Entity Embed Display Plugins
 
-Embedding entities uses an entity embed display plugin, provided in the
+Embedding entities uses an Entity Embed Display plugin, provided in the
 'data-entity-embed-display' attribute. By default we provide four different
-display plugins out of the box:
+Entity Embed Display plugins out of the box:
 
 - entity_reference:_formatter_id_: Renders the entity using a specific Entity
   Reference field formatter.
@@ -101,7 +101,7 @@ display plugins out of the box:
   formatter. This will only work if the entity is a file entity type, and the
   file is an image.
 
-Configuration for the display plugin can be provided by using a
+Configuration for the Entity Embed Display plugin can be provided by using a
 'data-entity-embed-settings' attribute, which contains a JSON-encoded array
 value. Note that care must be used to use single quotes around the attribute
 value since JSON-encoded arrays typically contain double quotes.

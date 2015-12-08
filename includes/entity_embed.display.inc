@@ -17,7 +17,7 @@
  *   the embed HTML tag.
  *
  * @return string
- *   The HTML of the entity rendered with the display plugin.
+ *   The HTML of the entity rendered with the Entity Embed Display plugin.
  */
 function entity_embed_render_entity($entity_type, $entity, array $context = array()) {
   // Support the deprecated view-mode data attribute.
@@ -36,8 +36,8 @@ function entity_embed_render_entity($entity_type, $entity, array $context = arra
     'data-entity-embed-settings' => array(),
   );
 
-  // The default display plugin has been deprecated by the rendered entity
-  // field formatter.
+  // The default Entity Embed Display plugin has been deprecated by the
+  // rendered entity field formatter.
   if ($context['data-entity-embed-display'] === 'default') {
     $context['data-entity-embed-display'] = 'entityreference:entityreference_entity_view';
   }
@@ -45,8 +45,8 @@ function entity_embed_render_entity($entity_type, $entity, array $context = arra
   // Allow modules to alter the entity prior to embed rendering.
   drupal_alter(array("{$context['data-entity-type']}_embed_context", 'entity_embed_context'), $context, $entity);
 
-  // Build and render the display plugin, allowing modules to alter the
-  // result before rendering.
+  // Build and render the Entity Embed Display plugin, allowing modules to
+  // alter the result before rendering.
   $build = render_entity_embed_display_plugin(
     $entity_type,
     $entity,
@@ -62,14 +62,14 @@ function entity_embed_render_entity($entity_type, $entity, array $context = arra
 }
 
 /**
- * Renders an entity using an EntityEmbedDisplay plugin.
+ * Renders an entity using an Entity Embed Display plugin.
  *
  * @param $entity_type
  *   The type of entity, i.e. 'node', 'user'.
  * @param $entity
  *   The entity to be rendered.
  * @param string $plugin_id
- *   The EntityEmbedDisplay plugin ID.
+ *   The Entity Embed Display plugin ID.
  * @param array $plugin_configuration
  *   (optional) Array of plugin configuration values.
  * @param array $context
@@ -77,7 +77,7 @@ function entity_embed_render_entity($entity_type, $entity, array $context = arra
  *   tag's attributes.
  *
  * @return array
- *   A render array for the display plugin.
+ *   A render array for the Entity Embed Display plugin.
  */
 function render_entity_embed_display_plugin($entity_type, $entity, $plugin_id, array $plugin_configuration = array(), array $context = array()) {
   // Check if the display plugin is accessible.
