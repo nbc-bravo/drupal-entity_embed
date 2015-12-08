@@ -304,12 +304,18 @@ function _entity_embed_preview_format_access($format) {
 function _entity_embed_button_is_enabled($filter_format, $embed_button) {
   editor_format_ensure_additional_properties($filter_format);
 
+  if (!editor_load($filter_format->editor)) {
+    return FALSE;
+  }
+
   $button_name = $embed_button->name;
 
-  foreach ($filter_format->editor_settings['toolbar'] as $row) {
-    foreach ($row as $button_group) {
-      if (in_array($button_name, $button_group['items'])) {
-        return TRUE;
+  if (!empty($filter_format->editor_settings['toolbar'])) {
+    foreach ($filter_format->editor_settings['toolbar'] as $row) {
+      foreach ($row as $button_group) {
+        if (in_array($button_name, $button_group['items'])) {
+          return TRUE;
+        }
       }
     }
   }
