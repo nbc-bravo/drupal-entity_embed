@@ -204,6 +204,12 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
         }
       }
 
+      // The 'Rendered entity' formatter can not be used for files unless
+      // the file_entity module is available.
+      if (!empty($formatter_options['entityreference:entityreference_entity_view']) && $entity_element['data-entity-type'] == 'file' && !module_exists('file_entity')) {
+        unset($formatter_options['entityreference:entityreference_entity_view']);
+      }
+
       // Build the list of allowed Entity Embed Display plugins.
       $allowed_plugins = $embed_button->display_plugins;
 
