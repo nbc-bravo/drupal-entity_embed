@@ -88,11 +88,11 @@ function render_entity_embed_display_plugin($entity_type, $entity, $plugin_id, a
   // Split the formatter into separate parts.
   $formatter_parts = explode(':', $plugin_id);
   $formatter_module = $formatter_parts[0];
-  $formatter_name = $formatter_parts[1];
+  $formatter_type = $formatter_parts[1];
 
   list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
 
-  $field_formatter_info = field_info_formatter_types($formatter_name);
+  $field_formatter_info = field_info_formatter_types($formatter_type);
 
   // With the File Entity module enabled, file entities require some special
   // handling. Unlike standard field formatters which specify a list of
@@ -116,8 +116,8 @@ function render_entity_embed_display_plugin($entity_type, $entity, $plugin_id, a
   if (isset($field_formatter_info['module'])) {
     // Set $display['type'] and $display['settings'] to what
     // hook_field_formatter_*() expects.
-    $display['type'] = $formatter_name;
-    $display['settings'] = $plugin_configuration;
+    $display['type'] = $formatter_type;
+    $display['settings'] = $plugin_configuration += field_info_formatter_settings($formatter_type); // Use default settings if no settings are available.
 
     // Set $items to what the field formatter expects. See hook_field_load(),
     // and note that, here, $entity is already a fully loaded entity.
@@ -134,7 +134,7 @@ function render_entity_embed_display_plugin($entity_type, $entity, $plugin_id, a
     // by adding in any missing information using the entity_embed_field_info
     // hooks.
     $field = entity_embed_field_info_field($entity_type, $field_formatter_info['module']);
-    $instance = entity_embed_field_info_instance($formatter_name, $plugin_configuration);
+    $instance = entity_embed_field_info_instance($formatter_type, $plugin_configuration);
 
     if (($function = ($field_formatter_info['module'] . '_field_formatter_prepare_view')) && function_exists($function)) {
       // hook_field_formatter_prepare_view() alters $items by reference.
@@ -319,8 +319,8 @@ function entity_embed_field_get_items($entity_type, $entity_id, $module) {
 /**
  * Our own field-less entity-less version of field_get_display().
  *
- * @param string $formatter
- *   The entity type of the entity we are trying to embed.
+ * @param $formatter_type
+ *   A formatter type name.
  *
  * @param int $settings
  *   Optional array of settings to pass in. If omitted, the formatter's default
@@ -338,17 +338,17 @@ function entity_embed_field_get_items($entity_type, $entity_id, $module) {
  * Luckily this can be the same regardless of formatter/module, so we don't
  * need to hard-code module support or invoke any hooks.
  */
-function entity_embed_field_get_display($formatter, $settings = array()) {
+function entity_embed_field_get_display($formatter_type, $settings = array()) {
   // If settings is empty, we need to get defaults.
   if (empty($settings)) {
-    $formatter_info = field_info_formatter_types($formatter);
+    $formatter_info = field_info_formatter_types($formatter_type);
     if (!empty($formatter_info['settings'])) {
       $settings = $formatter_info['settings'];
     }
   }
 
   return array(
-    'type' => $formatter,
+    'type' => $formatter_type,
     'settings' => $settings,
   );
 }
@@ -417,8 +417,8 @@ function entity_embed_field_info_field($entity_type, $module) {
 /**
  * Our own field-less entity-less version of field_info_instance().
  *
- * @param string $formatter
- *   The entity type of the entity we are trying to embed.
+ * @param $formatter_type
+ *   A formatter type name.
  *
  * @param int $settings
  *   Optional array of settings to pass in. If omitted, the formatter's default
@@ -431,10 +431,62 @@ function entity_embed_field_info_field($entity_type, $module) {
  *
  * This is mainly a wrapper around entity_embed_field_get_display().
  */
-function entity_embed_field_info_instance($formatter, $settings = array()) {
+function entity_embed_field_info_instance($formatter_type, $settings = array()) {
   return array(
     'display' => array(
-      'default' => entity_embed_field_get_display($formatter, $settings),
+      'default' => entity_embed_field_get_display($formatter_type, $settings),
     ),
   );
+}
+
+/**
+ * Our own field-less entity-less version of field_info_formatter_settings().
+ *
+ * @param $entity_type
+ *   The type of entity, i.e. 'node', 'user'.
+ * @param $entity
+ *   The entity to be rendered.
+ * @param $formatter_type
+ *   A formatter type name.
+ * @param int $settings
+ *   Optional array of settings to pass in. If omitted, the formatter's default
+ *   settings will be returned.
+ * @param $form
+ *   A form array().
+ * @param $form_state
+ *   A form state array.
+ *
+ * In our version of field_info_formatter_settings() we don't care at all about
+ * the field itself. All we want is the field info array in a format that lets
+ * us hack hook_field_formatter_settings_form().
+ */
+function entity_embed_field_info_formatter_settings($entity_type, $entity, $formatter_type, $settings = array(), $form, $form_state) {
+  $formatter_settings = array();
+
+  $field_formatter_info = field_info_formatter_types($formatter_type);
+
+  // Invoke hook_field_formatter_settings_form(). We are reusing field
+  // formatter functions, but we are not working with a Field API field,
+  // so set $field accordingly. Unfortunately, the API is for $settings to
+  // be transferred via the $instance parameter, so we must mock it.
+  if (isset($field_formatter_info['module']) && ($function = ($field_formatter_info['module'] . '_field_formatter_settings_form')) && function_exists($function)) {
+    list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+
+    $field = NULL;
+    $view_mode = 'default';
+    $mock_instance = array(
+      'display' => array(
+        $view_mode => array(
+          'type' => $formatter_type,
+          'settings' => $settings + field_info_formatter_settings($formatter_type),
+        ),
+      ),
+      'entity_type' => $entity_type,
+      'bundle' => $bundle,
+    );
+
+    $formatter_settings += $function($field, $mock_instance, $view_mode, $form, $form_state);
+  }
+
+  return $formatter_settings;
 }

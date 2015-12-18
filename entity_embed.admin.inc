@@ -259,39 +259,15 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
       // Split the formatter into separate parts.
       $formatter_parts = explode(':', $plugin_id);
       $formatter_module = $formatter_parts[0];
-      $formatter_name = $formatter_parts[1];
+      $formatter_type = $formatter_parts[1];
 
       // Retrieve the settings appropriate for the currently selected formatter.
-      if (!empty($formatter_name)) {
+      if (!empty($formatter_type)) {
         if (is_string($entity_element['data-entity-embed-settings'])) {
           $entity_element['data-entity-embed-settings'] = drupal_json_decode($entity_element['data-entity-embed-settings']);
         }
 
-        $field_formatter_info = field_info_formatter_types($formatter_name);
-
-        // Invoke hook_field_formatter_settings_form(). We are reusing field
-        // formatter functions, but we are not working with a Field API field,
-        // so set $field accordingly. Unfortunately, the API is for $settings to
-        // be transferred via the $instance parameter, so we must mock it.
-        if (isset($field_formatter_info['module']) && ($function = ($field_formatter_info['module'] . '_field_formatter_settings_form')) && function_exists($function)) {
-          list($id, $vid, $bundle) = entity_extract_ids($entity_element['data-entity-type'], $entity);
-
-          $field = NULL;
-          $view_mode = 'default';
-          $mock_instance = array(
-            'display' => array(
-              $view_mode => array(
-                'type' => $formatter_name,
-                'settings' => $entity_element['data-entity-embed-settings'] + field_info_formatter_settings($formatter_name),
-              ),
-            ),
-            'entity_type' => $entity_element['data-entity-type'],
-            'bundle' => $bundle,
-          );
-
-          $settings = $function($field, $mock_instance, $view_mode, $form, $form_state);
-          $form['attributes']['data-entity-embed-settings'] += $settings;
-        }
+        $form['attributes']['data-entity-embed-settings'] += entity_embed_field_info_formatter_settings($entity_element['data-entity-type'], $entity, $formatter_type, $entity_element['data-entity-embed-settings'], $form, $form_state);
       }
 
       $filters = filter_list_format($filter_format->format);
