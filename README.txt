@@ -5,7 +5,6 @@ CONTENTS OF THIS FILE
  * Requirements
  * Installation
  * Usage
- * Technical details
 
 INTRODUCTION
 ------------
@@ -60,12 +59,14 @@ Embedding entities with WYSIWYG:
 
 * For example, create a new *Article* content.
 * Click on the 'E' button in the text editor.
-* Enter part of the title of the entity you're looking for and select one of the search results.
+* Enter part of the title of the entity you're looking for and select one of the
+  search results.
 * For **Display as**, choose one of the following options:
   * Rendered Entity
   * Entity ID
   * Label
-* If chosen **Rendered Entity**, choose one of the following options for **View mode**:
+* If chosen **Rendered Entity**, choose one of the following options for
+  **View mode**:
   * Default
   * Full content
   * RSS
