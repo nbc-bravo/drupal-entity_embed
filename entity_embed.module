@@ -14,6 +14,9 @@ require_once dirname(__FILE__) . '/includes/entity_embed.commands.inc';
 // File usage tracking.
 require_once dirname(__FILE__) . '/includes/entity_embed.file_usage.inc';
 
+// Display functions.
+require_once dirname(__FILE__) . '/includes/entity_embed.display.inc';
+
 /**
  * Implements hook_permission().
  */
@@ -472,7 +475,7 @@ function _entity_embed_render_placeholders_tips($filter, $format, $long = FALSE)
  *
  * Converts embedded entity placeholders into rendered entities.
  */
-function _entity_embed_render_placeholders($text) {
+function _entity_embed_render_placeholders($text, $filter, $format, $langcode, $cache, $cache_id) {
   $result = $text;
 
   if (strpos($text, 'data-entity-type') !== FALSE && (strpos($text, 'data-entity-embed-display') !== FALSE || strpos($text, 'data-view-mode') !== FALSE)) {
@@ -482,6 +485,7 @@ function _entity_embed_render_placeholders($text) {
     foreach ($xpath->query('//*[@data-entity-type and (@data-entity-uuid or @data-entity-id) and (@data-entity-embed-display or @data-view-mode)]') as $node) {
       $entity_type = $node->getAttribute('data-entity-type');
       $entity = NULL;
+      $entity_output = '';
 
       try {
         // Load the entity either by UUID (preferred) or ID.
@@ -497,48 +501,34 @@ function _entity_embed_render_placeholders($text) {
         }
 
         if ($entity) {
+          // Protect ourselves from recursive rendering.
+          static $depth = 0;
+          $depth++;
+          if ($depth > 20) {
+            throw new EntityEmbedRecursiveRenderingException(sprintf('Recursive rendering detected when rendering embedded %s entity %s.', $entity_type, $id));
+          }
+
           // If a UUID was not used, but is available, add it to the HTML.
           if (!$node->getAttribute('data-entity-uuid') && !empty($entity->uuid)) {
             $node->setAttribute('data-entity-uuid', $entity->uuid);
           }
+
+          $context = entity_embed_get_dom_node_attributes_as_array($node);
+          $context += array('data-langcode' => $langcode);
+          $entity_output = entity_embed_render_entity($entity_type, $entity, $context);
+
+          $depth--;
         }
-
-        if ($entity) {
-          $context = array();
-
-          // Set the initial langcode but it can be overridden by a data
-          // attribute.
-          if (!empty($langcode)) {
-            $context['data-langcode'] = $langcode;
-          }
-
-          // Convert the data attributes to the context array.
-          foreach ($node->attributes as $attribute) {
-            $key = $attribute->nodeName;
-            $context[$key] = $attribute->nodeValue;
-
-            // Check for JSON-encoded attributes.
-            $data = json_decode($context[$key], TRUE, 10);
-            if ($data !== NULL && json_last_error() === JSON_ERROR_NONE) {
-              $context[$key] = $data;
-            }
-          }
-
-          // Support the deprecated view-mode data attribute.
-          if (isset($context['data-view-mode']) && !isset($context['data-entity-embed-display']) && !isset($context['data-entity-embed-settings'])) {
-            $context['data-entity-embed-settings']['view_mode'] = $context['data-view-mode'];
-            unset($context['data-view-mode']);
-          }
-
-          $placeholder = entity_embed_build_placeholder($entity_type, $entity, $context);
-          if (!empty($placeholder)) {
-            entity_embed_set_dom_node_content($node, $placeholder);
-          }
+        else {
+          throw new EntityEmbedEntityNotFoundException(sprintf('Unable to load embedded %s entity %s.', $entity_type, $id));
         }
       }
+
       catch(\Exception $e) {
         watchdog_exception('entity_embed', $e);
       }
+
+      entity_embed_set_dom_node_content($node, $entity_output);
     }
 
     $result = entity_embed_serialize($dom);
@@ -597,93 +587,6 @@ function _entity_embed_filter_align($text) {
   }
 
   return $result;
-}
-
-/**
- * Build a render array placeholder that will eventually render an entity.
- *
- * @param string $entity_type
- *   The type of entity to be rendered.
- * @param Entity $entity
- *   The entity to be rendered.
- * @param array $context
- *   (optional) An array of contextual information to be included in the
- *   generated placeholder.
- *
- * @return string
- *   The HTML of the entity rendered with the given context.
- */
-function entity_embed_build_placeholder($entity_type, $entity, $context = array()) {
-  $callback = 'entity_embed_render_embed';
-  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-
-  $context['data-entity-type'] = $entity_type;
-  $context['data-entity-id'] = $id;
-
-  $context += array(
-    'data-entity-embed-display' => 'default',
-    'data-entity-embed-settings' => array(),
-    'data-langcode' => NULL,
-  );
-
-  // Allow modules to alter the context.
-  drupal_alter('entity_embed_context', $context, $callback, $entity);
-
-  $placeholder = $callback($entity, $context);
-
-  return $placeholder;
-}
-
-/**
- * Default callback to render an embedded entity.
- *
- * @param Entity $entity
- *   The entity to be rendered.
- * @param array $context
- *   An array of contextual information to be included in the generated
- *   placeholder.
- *
- * @return string
- *   The HTML of the entity rendered with the given context.
- */
-function entity_embed_render_embed($entity, $context) {
-  // Protect ourselves from recursive rendering.
-  static $depth = 0;
-  $depth++;
-
-  if ($depth > 20) {
-    throw new Exception(t('Recursive rendering detected when rendering entity @entity_type(@entity_id). Aborting rendering.', array('@entity_type' => $context['data-entity-type'], '@entity_id' => $context['data-entity-id'])));
-  }
-
-  // Allow modules to alter the entity prior to display rendering.
-  module_invoke_all('entity_preembed', $entity, $context);
-
-  // Verify that the user has permission to view the entity.
-  if (!entity_access('view', $context['data-entity-type'], $entity)) {
-    return '';
-  }
-
-  $entity = clone $entity;
-  unset($entity->content);
-
-  // Build and render the entity, allowing modules to alter the result before
-  // rendering.
-  $renderable_array = entity_view($context['data-entity-type'], array($entity), $context['data-entity-embed-settings']['view_mode'], $context['data-langcode']);
-
-  // Workaround for file_entity module that does not have the patch in
-  // https://www.drupal.org/node/2365821 applied yet.
-  if ($context['data-entity-type'] === 'file' && isset($renderable_array['files'])) {
-    $renderable_array = array('file' => reset($renderable_array));
-  }
-
-  // The output of entity_view() is keyed by the entity type and ID.
-  $build = $renderable_array[$context['data-entity-type']][$context['data-entity-id']];
-
-  drupal_alter('entity_embed', $build, $entity, $context);
-  $entity_output = drupal_render($build);
-
-  $depth--;
-  return $entity_output;
 }
 
 /**
