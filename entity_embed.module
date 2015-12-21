@@ -46,8 +46,8 @@ function entity_embed_menu() {
     'page arguments' => array(3, 4),
     'access callback' => '_entity_embed_button_is_enabled',
     'access arguments' => array(3, 4),
-    'delivery callback' => 'ajax_deliver',
     'file' => 'entity_embed.admin.inc',
+    'delivery callback' => 'ajax_deliver'
     'theme callback' => 'ajax_base_page_theme',
     'type' => MENU_CALLBACK,
   );
