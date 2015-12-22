@@ -281,7 +281,7 @@ class EntityEmbedHooksTest extends EntityEmbedTestBase {
   }
 
   public function setUp() {
-    parent::setUp('entity_embed_test');
+    parent::setUp('entity_embed_test', 'uuid');
   }
 
   /**
