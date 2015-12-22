@@ -118,7 +118,7 @@ class EntityEmbedFilterTest extends EntityEmbedTestBase {
     $node = $this->drupalCreateNode($settings);
     $this->drupalGet('node/' . $node->nid);
     $this->assertNoRaw('<drupal-entity data-entity-type="node" data-entity');
-    $this->assertText(strip_tags($content), 'Placeholder appears in the output when embed is unsuccessful.');
+    $this->assertNoText(strip_tags($content), 'Placeholder does not appear in the output when embed is unsuccessful.');
 
     // Ensure that UUID is preferred over ID when both attributes are present.
     $sample_node = $this->drupalCreateNode();
@@ -134,26 +134,26 @@ class EntityEmbedFilterTest extends EntityEmbedTestBase {
     $this->assertNoText($sample_node->body[LANGUAGE_NONE][0]['value'], 'Entity specified with ID does not exists in the page.');
     $this->assertNoText(strip_tags($content), 'Placeholder not appears in the output when embed is successful.');
 
-    // Test entity embed using 'default' display plugin.
+//    // Test deprecated 'default' Entity Embed Display plugin.
 //    $content = '<drupal-entity data-entity-type="node" data-entity-uuid="' . $this->node->uuid . '" data-entity-embed-display="default" data-entity-embed-settings=\'{"view_mode":"teaser"}\'>This placeholder should not be rendered.</drupal-entity>';
 //    $settings = array();
 //    $settings['type'] = 'page';
 //    $settings['title'] = 'Test entity embed with entity-embed-display and data-entity-embed-settings';
 //    $settings['body'] = array(LANGUAGE_NONE => array(array('value' => $content, 'format' => 'custom_format')));
 //    $node = $this->drupalCreateNode($settings);
-//    $this->drupalGet('node/' . $node->id());
+//    $this->drupalGet('node/' . $node->nid);
 //    $this->assertText($this->node->body[LANGUAGE_NONE][0]['value'], 'Embedded node exists in page');
 //    $this->assertNoText(strip_tags($content), 'Placeholder does not appear in the output when embed is successful.');
-
-    // Ensure that display plugin is preferred over view mode when both
-    // attributes are present.
+//
+//    // Ensure that Entity Embed Display plugin is preferred over view mode when
+//    // both attributes are present.
 //    $content = '<drupal-entity data-entity-type="node" data-entity-uuid="' . $this->node->uuid . '" data-entity-embed-display="default" data-entity-embed-settings=\'{"view_mode":"teaser"}\' data-view-mode="some-invalid-view-mode">This placeholder should not be rendered.</drupal-entity>';
 //    $settings = array();
 //    $settings['type'] = 'page';
 //    $settings['title'] = 'Test entity embed with entity-embed-display and data-entity-embed-settings';
 //    $settings['body'] = array(LANGUAGE_NONE => array(array('value' => $content, 'format' => 'custom_format')));
 //    $node = $this->drupalCreateNode($settings);
-//    $this->drupalGet('node/' . $node->id());
+//    $this->drupalGet('node/' . $node->nid);
 //    $this->assertText($this->node->body[LANGUAGE_NONE][0]['value'], 'Embedded node exists in page with the view mode specified by entity-embed-settings.');
 //    $this->assertNoText(strip_tags($content), 'Placeholder does not appear in the output when embed is successful.');
 
@@ -290,27 +290,10 @@ class EntityEmbedHooksTest extends EntityEmbedTestBase {
    * This method tests all the hooks provided by entity_embed.
    */
   function testEntityEmbedHooks() {
-    // Enable entity_embed_test.module's hook_entity_preembed() implementation
-    // and ensure it is working as designed.
-    variable_set('entity_embed_test_entity_preembed', TRUE);
-    $content = '<div data-entity-type="node" data-entity-id="' . $this->node->nid . '" data-view-mode="full">This placeholder should not be rendered.</div>';
-    $settings = array();
-    $settings['type'] = 'page';
-    $settings['title'] = 'Test hook_entity_preembed()';
-    $settings['body'] = array(LANGUAGE_NONE => array(array('value' => $content, 'format' => 'custom_format')));
-    $node = $this->drupalCreateNode($settings);
-    $this->drupalGet('node/' . $node->nid);
-    $this->assertText($this->node->body[LANGUAGE_NONE][0]['value'], 'Embedded node exists in page.');
-    $this->assertNoText(strip_tags($content), 'Placeholder does not appears in the output when embed is successful.');
-    // Ensure that embedded node's title has been replaced.
-    $this->assertText('Title set by hook_entity_preembed', 'Title of the embedded node is replaced by hook_entity_preembed()');
-    $this->assertNoText($this->node->title, 'Original title of the embedded node is not visible.');
-    variable_set('entity_embed_test_entity_preembed', FALSE);
-
     // Enable entity_embed_test.module's hook_entity_embed_alter()
     // implementation and ensure it is working as designed.
     variable_set('entity_embed_test_entity_embed_alter', TRUE);
-    $content = '<drupal-entity data-entity-type="node" data-entity-uuid="' . $this->node->uuid . '" data-entity-embed-display="default" data-entity-embed-settings=\'{"view_mode":"teaser"}\'>This placeholder should not be rendered.</drupal-entity>';
+    $content = '<drupal-entity data-entity-type="node" data-entity-uuid="' . $this->node->uuid . '" data-entity-embed-display="default" data-entity-embed-settings=\'{"view_mode":"full"}\'>This placeholder should not be rendered.</drupal-entity>';
     $settings = array();
     $settings['type'] = 'page';
     $settings['title'] = 'Test hook_entity_embed_alter()';
