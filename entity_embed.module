@@ -659,7 +659,7 @@ function _entity_embed_render_placeholders($text, $filter, $format, $langcode, $
         watchdog_exception('entity_embed', $e);
       }
 
-      entity_embed_set_dom_node_content($node, $entity_output);
+      entity_embed_replace_dom_node_content($node, $entity_output);
     }
 
     $result = entity_embed_serialize($dom);
