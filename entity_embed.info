@@ -12,6 +12,9 @@ dependencies[] = jquery_update
 test_dependencies[] = media
 test_dependencies[] = uuid
 
+files[] = includes/EntityEmbedEntityNotFoundException.inc
+files[] = includes/EntityEmbedRecursiveRenderingException.inc
+
 files[] = entity_embed.test
 
 configure = admin/config/content/embed-button
