@@ -1,5 +1,5 @@
 name = Entity Embed
-description = Integrates with CKEditor to allow any entity to be embedded within a text area.
+description = Allows entities to be embedded using a text editor.
 package = Media
 core = 7.x
 
