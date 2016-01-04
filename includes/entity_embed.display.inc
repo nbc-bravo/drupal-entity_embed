@@ -79,8 +79,6 @@ function render_entity_embed_display_plugin($entity_type, $entity, $plugin_id, a
     return array();
   }
 
-  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-
   // Build and render the entity.
   $render = entity_view($entity_type, array($entity), $plugin_configuration['view_mode'], $context['data-langcode']);
 
@@ -90,6 +88,5 @@ function render_entity_embed_display_plugin($entity_type, $entity, $plugin_id, a
     $render = array('file' => reset($render));
   }
 
-  // The output of entity_view() is keyed by the entity type and ID.
-  return $render[$entity_type][$id];
+  return $render;
 }
