@@ -38,6 +38,7 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
     'data-entity-embed-display' => 'entityreference:entityreference_entity_view',
     'data-entity-embed-settings' => array(),
     'data-align' => '',
+    'data-caption' => '',
   );
 
   if (empty($form_state['step'])) {
@@ -297,7 +298,19 @@ function entity_embed_dialog_form($form, &$form_state, $filter_format, $embed_bu
         );
       }
 
-      // @todo Re-add caption attribute.
+      // When Editor's editor_caption is being used, the text editor may offer
+      // the ability to add a caption.
+      if (isset($entity_element['data-caption']) && isset($filters['editor_caption']) && $filters['editor_caption']->status) {
+        $form['attributes']['data-caption'] = array(
+          '#title' => t('Caption'),
+          '#type' => 'textfield',
+          '#default_value' => $entity_element['data-caption'] === '' ? '' : $entity_element['data-caption'],
+          '#wrapper_attributes' => array('class' => array('container-inline')),
+          '#attributes' => array('class' => array('container-inline')),
+          '#parents' => array('attributes', 'data-caption'),
+        );
+      }
+
       $form['actions'] = array(
         '#type' => 'actions',
       );
