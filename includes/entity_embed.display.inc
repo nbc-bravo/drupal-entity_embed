@@ -492,7 +492,7 @@ function entity_embed_field_info_formatter_settings($entity_type, $entity, $form
   if (isset($field_formatter_info['module']) && ($function = ($field_formatter_info['module'] . '_field_formatter_settings_form')) && function_exists($function)) {
     list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
 
-    $field = NULL;
+    $field = entity_embed_field_info_field($entity_type, $field_formatter_info['module']);
     $view_mode = 'default';
     $mock_instance = array(
       'display' => array(
