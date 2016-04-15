@@ -387,8 +387,14 @@ function entity_embed_field_get_display($formatter_type, $settings = array()) {
 function entity_embed_field_info_field($entity_type, $module) {
   $field = array();
 
+  // Support the file_entity module.
+  if ('file_entity' == $module) {
+    $field['settings'] = field_info_field_settings('file_entity');
+    $field['field_name'] = 'foo';
+  }
+
   // Support the entityreference module.
-  if ('entityreference' == $module) {
+  elseif ('entityreference' == $module) {
     $field['settings'] = field_info_field_settings('entityreference');
     $field['settings']['target_type'] = $entity_type;
   }
