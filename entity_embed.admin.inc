@@ -59,6 +59,7 @@ function entity_embed_dialog_form($form, &$form_state, $input, $filter_format, $
     'data-entity-embed-display' => 'default',
     'data-entity-embed-settings' => array(),
     'data-align' => '',
+    'data-caption' => '',
     'data-view-mode' => '',
   );
 
@@ -258,7 +259,19 @@ function entity_embed_dialog_form($form, &$form_state, $input, $filter_format, $
         );
       }
 
-      // @todo Re-add caption attribute.
+      // When Drupal core's filter_caption is being used, the text editor may
+      // offer the ability to add a caption.
+      if (isset($entity_element['data-caption']) && isset($filters['filter_caption']) && $filters['filter_caption']->status) {
+        $form['attributes']['data-caption'] = array(
+          '#title' => t('Caption'),
+          '#type' => 'textfield',
+          '#default_value' => $entity_element['data-caption'] === '' ? '' : $entity_element['data-caption'],
+          '#wrapper_attributes' => array('class' => array('container-inline')),
+          '#attributes' => array('class' => array('container-inline')),
+          '#parents' => array('attributes', 'data-caption'),
+        );
+      }
+
       $form['actions'] = array(
         '#type' => 'actions',
       );
