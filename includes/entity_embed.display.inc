@@ -387,14 +387,10 @@ function entity_embed_field_get_display($formatter_type, $settings = array()) {
 function entity_embed_field_info_field($entity_type, $module) {
   $field = array();
 
-  // Support the file_entity module.
-  if ('file_entity' == $module) {
-    $field['settings'] = field_info_field_settings('file_entity');
-    $field['field_name'] = 'foo';
-  }
+  $field['field_name'] = '_entity_embed';
 
   // Support the entityreference module.
-  elseif ('entityreference' == $module) {
+  if ('entityreference' == $module) {
     $field['settings'] = field_info_field_settings('entityreference');
     $field['settings']['target_type'] = $entity_type;
   }
@@ -402,13 +398,11 @@ function entity_embed_field_info_field($entity_type, $module) {
   // Support the user_reference (references) module.
   elseif ('user_reference' == $module) {
     $field['settings'] = field_info_field_settings('user_reference');
-    $field['field_name'] = 'foo';
   }
 
   // Support node_reference (references) module.
   elseif ('node_reference' == $module) {
     $field['settings'] = field_info_field_settings('node_reference');
-    $field['field_name'] = 'foo';
   }
 
   // Support taxonomy (core) module.
@@ -416,8 +410,8 @@ function entity_embed_field_info_field($entity_type, $module) {
     $field['settings'] = field_info_field_settings('taxonomy_term_reference');
   }
 
-  // Support file (core) module.
-  elseif ('file' == $module) {
+  // Support file (core) and file_entity modules.
+  elseif ('file' == $module || 'file_entity' == $module) {
     $field['settings'] = field_info_field_settings('file');
   }
 
