@@ -24,11 +24,25 @@ function entity_embed_ckeditor_plugin() {
   $buttons = array();
 
   foreach ($embed_buttons as $embed_button) {
-    // CKEditor only supports icons relative to the plugin path.
-    // @todo: Figure out how to support custom icons.
+    $icon = 'entity.png';
+    $icon_path = FALSE;
+
+    // Use a custom icon when available.
+    if ($fid = $embed_button->button_icon_fid) {
+      if ($file = file_load($fid)) {
+        // We are unable to use _entity_embed_button_image() because CKEditor
+        // requires a specific format for icon paths.
+        if ($wrapper = file_stream_wrapper_get_instance_by_uri($file->uri)) {
+          $icon = file_uri_target($file->uri);
+          $icon_path = base_path() . $wrapper->getDirectoryPath() . '/';
+        }
+      }
+    }
+
     $buttons[$embed_button->name] = array(
       'label' => check_plain($embed_button->button_label),
-      'icon' => 'entity.png',
+      'icon' => $icon,
+      'icon_path' => $icon_path,
     );
   }
 
