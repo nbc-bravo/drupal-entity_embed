@@ -58,6 +58,18 @@ class EntityEmbedBuilder implements EntityEmbedBuilderInterface {
       'data-entity-embed-display-settings' => [],
     ];
 
+    // If the data-entity-embed-display-settings isn't an array reset  it,
+    // otherwise we'll encounter a fatal error when calling
+    // $this->buildEntityEmbedDisplayPlugin() further down the line.
+    if (!is_array($context['data-entity-embed-display-settings'])) {
+      \Drupal::logger('entity_embed')->warning('Invalid display settings encountered. Could not process following settings for entity type "@entity_type" with the uuid "@uuid": @settings', [
+        '@settings' => $context['data-entity-embed-display-settings'],
+        '@entity_type' => $entity->getEntityTypeId(),
+        '@uuid' => $entity->uuid(),
+      ]);
+      $context['data-entity-embed-display-settings'] = [];
+    }
+
     // The default Entity Embed Display plugin has been deprecated by the
     // rendered entity field formatter.
     if ($context['data-entity-embed-display'] === 'default') {
