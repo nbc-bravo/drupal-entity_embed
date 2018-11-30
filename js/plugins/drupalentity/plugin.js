@@ -139,7 +139,8 @@
             click: function(editor) {
               editor.execCommand('editdrupalentity', this.data);
             },
-            icon: button.image
+            icon: button.image,
+            modes: {wysiwyg: 1, source: 0}
           });
         }
       }
