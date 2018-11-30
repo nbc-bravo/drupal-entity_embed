@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginDependencyTrait;
 use Drupal\embed\EmbedType\EmbedTypeBase;
+use Drupal\entity_browser\EntityBrowserInterface;
 use Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -152,19 +153,22 @@ class Entity extends EmbedTypeBase implements ContainerFactoryPluginInterface {
 
       /** @var \Drupal\entity_browser\EntityBrowserInterface[] $browsers */
       if ($this->entityTypeManager->hasDefinition('entity_browser') && ($browsers = $this->entityTypeManager->getStorage('entity_browser')->loadMultiple())) {
-        $ids = array_keys($browsers);
-        $labels = array_map(
+        // Filter out unsupported displays & return array of ids and labels.
+        $browsers = array_map(
           function ($item) {
             /** @var \Drupal\entity_browser\EntityBrowserInterface $item */
             return $item->label();
           },
-          $browsers
+          // Filter out both modal and standalone forms as they don't work.
+          array_filter($browsers, function (EntityBrowserInterface $browser) {
+            return !in_array($browser->getDisplay()->getPluginId(), ['modal', 'standalone'], TRUE);
+          })
         );
-        $options = ['_none' => $this->t('None (autocomplete)')] + array_combine($ids, $labels);
+        $options = ['_none' => $this->t('None (autocomplete)')] + $browsers;
         $form['entity_browser'] = [
           '#type' => 'select',
           '#title' => $this->t('Entity browser'),
-          '#description' => $this->t('Entity browser to be used to select entities to be embedded. Note that not all display plugins from Entity Browser are compatible with Entity Embed. For example, the "iFrame" display is compatible, while the "Modal" display is not.'),
+          '#description' => $this->t('Entity browser to be used to select entities to be embedded. Only compatible browsers will be available to be chosen.'),
           '#options' => $options,
           '#default_value' => $this->getConfigurationValue('entity_browser'),
         ];

@@ -521,7 +521,7 @@ class EntityEmbedDialog extends FormBase {
    *   The current state of the form.
    */
   public function validateSelectStep(array $form, FormStateInterface $form_state) {
-    if ($form_state->hasValue(['entity_browser', 'entities'])) {
+    if (($form_state->hasValue(['entity_browser', 'entities'])) && (count($form_state->getValue(['entity_browser', 'entities'])) > 0)) {
       $id = $form_state->getValue(['entity_browser', 'entities', 0])->id();
       $element = $form['entity_browser'];
     }
