@@ -6,6 +6,27 @@
  * format.
  */
 
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function entity_embed_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.entity_embed':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The Entity Embed module allows entities to be embedded in formatted text.') . '</p>';
+      $output .= '<h3>' . t('Uses') . '</h3>';
+      $output .= '<dl>';
+      $output .= '<dt>' . t('Embedding media') . '</dt>';
+      $output .= '<dd>' . t('This module, and the text filter that it provides along with the CKEditor integration, is especially suited to allow content authors to embed media in their textual content: images, video, and so on.') . '</dd>';
+      $output .= '<dt>' . t('Embedding arbitrary content') . '</dt>';
+      $output .= '<dd>' . t('As mentioned above, this module is especially helpful for embedding media in textual content, but it is not necessarily restricted to that; it allows <em>any</em> entity to be embedded. On an e-commerce site, you may want to embed products, on a company blog you may want to embed past projects, and so on.') . '</dd>';
+      $output .= '</dl>';
+      return $output;
+  }
+}
 /**
  * Implements hook_theme().
  */
