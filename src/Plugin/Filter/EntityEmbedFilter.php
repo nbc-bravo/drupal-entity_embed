@@ -139,7 +139,7 @@ class EntityEmbedFilter extends FilterBase implements ContainerFactoryPluginInte
             }
 
             $context = $this->getNodeAttributesAsArray($node);
-            $context += array('data-langcode' => $langcode);
+            $context += ['data-langcode' => $langcode];
             $build = $this->builder->buildEntityEmbed($entity, $context);
             // We need to render the embedded entity:
             // - without replacing placeholders, so that the placeholders are

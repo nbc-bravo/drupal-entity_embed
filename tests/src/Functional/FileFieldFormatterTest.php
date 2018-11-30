@@ -49,13 +49,13 @@ class FileFieldFormatterTest extends EntityEmbedTestBase {
 
     // Ensure that correct form attributes are returned for the file field
     // formatter plugins.
-    $form = array();
+    $form = [];
     $form_state = new FormState();
-    $plugins = array(
+    $plugins = [
       'file:file_table',
       'file:file_default',
       'file:file_url_plain',
-    );
+    ];
     // Ensure that description field is available for all the 'file' plugins.
     foreach ($plugins as $plugin) {
       $display = $this->container->get('plugin.manager.entity_embed.display')
@@ -68,12 +68,14 @@ class FileFieldFormatterTest extends EntityEmbedTestBase {
     }
 
     // Test entity embed using 'Generic file' Entity Embed Display plugin.
-    $embed_settings = array('description' => "This is sample description");
+    $embed_settings = [
+      'description' => 'This is sample description',
+    ];
     $content = '<drupal-entity data-entity-type="file" data-entity-uuid="' . $this->file->uuid() . '" data-entity-embed-display="file:file_default" data-entity-embed-display-settings=\'' . Json::encode($embed_settings) . '\'>This placeholder should not be rendered.</drupal-entity>';
-    $settings = array();
+    $settings = [];
     $settings['type'] = 'page';
     $settings['title'] = 'Test entity embed with file:file_default';
-    $settings['body'] = array(array('value' => $content, 'format' => 'custom_format'));
+    $settings['body'] = [['value' => $content, 'format' => 'custom_format']];
     $node = $this->drupalCreateNode($settings);
     $this->drupalGet('node/' . $node->id());
     $this->assertText($embed_settings['description'], 'Description of the embedded file exists in page.');

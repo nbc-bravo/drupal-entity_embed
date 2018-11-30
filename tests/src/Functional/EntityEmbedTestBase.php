@@ -84,10 +84,10 @@ abstract class EntityEmbedTestBase extends BrowserTestBase {
     $this->drupalLogin($this->webUser);
 
     // Create a sample node to be embedded.
-    $settings = array();
+    $settings = [];
     $settings['type'] = 'page';
     $settings['title'] = 'Embed Test Node';
-    $settings['body'] = array('value' => 'This node is to be used for embedding in other nodes.', 'format' => 'custom_format');
+    $settings['body'] = ['value' => 'This node is to be used for embedding in other nodes.', 'format' => 'custom_format'];
     $this->node = $this->drupalCreateNode($settings);
   }
 

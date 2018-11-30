@@ -44,14 +44,14 @@ abstract class EntityEmbedDisplayBase extends PluginBase implements ContainerFac
    *
    * @var array
    */
-  public $context = array();
+  public $context = [];
 
   /**
    * The attributes on the embedded entity.
    *
    * @var array
    */
-  public $attributes = array();
+  public $attributes = [];
 
   /**
    * {@inheritdoc}
@@ -131,14 +131,14 @@ abstract class EntityEmbedDisplayBase extends PluginBase implements ContainerFac
    * {@inheritdoc}
    */
   public function calculateDependencies() {
-    return array();
+    return [];
   }
 
   /**
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array();
+    return [];
   }
 
   /**

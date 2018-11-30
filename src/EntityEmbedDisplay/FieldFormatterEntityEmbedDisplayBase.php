@@ -144,7 +144,7 @@ abstract class FieldFormatterEntityEmbedDisplayBase extends EntityEmbedDisplayBa
   public function build() {
     // Create a temporary node object to which our fake field value can be
     // added.
-    $node = Node::create(array('type' => '_entity_embed'));
+    $node = Node::create(['type' => '_entity_embed']);
 
     $definition = $this->getFieldDefinition();
 
@@ -161,7 +161,7 @@ abstract class FieldFormatterEntityEmbedDisplayBase extends EntityEmbedDisplayBa
 
     // Prepare, expects an array of items, keyed by parent entity ID.
     $formatter = $this->getFieldFormatter();
-    $formatter->prepareView(array($node->id() => $items));
+    $formatter->prepareView([$node->id() => $items]);
     $build = $formatter->viewElements($items, $this->getLangcode());
     // For some reason $build[0]['#printed'] is TRUE, which means it will fail
     // to render later. So for now we manually fix that.
@@ -192,20 +192,20 @@ abstract class FieldFormatterEntityEmbedDisplayBase extends EntityEmbedDisplayBa
    */
   public function getFieldFormatter() {
     if (!isset($this->fieldFormatter)) {
-      $display = array(
+      $display = [
         'type' => $this->getFieldFormatterId(),
         'settings' => $this->getConfiguration(),
         'label' => 'hidden',
-      );
+      ];
 
       // Create the formatter plugin. Will use the default formatter for that
       // field type if none is passed.
       $this->fieldFormatter = $this->formatterPluginManager->getInstance(
-        array(
+        [
           'field_definition' => $this->getFieldDefinition(),
           'view_mode' => '_entity_embed',
           'configuration' => $display,
-        )
+        ]
       );
     }
 

@@ -116,39 +116,39 @@ class Entity extends EmbedTypeBase implements ContainerFactoryPluginInterface {
     $embed_button = $form_state->getTemporaryValue('embed_button');
     $entity_type_id = $this->getConfigurationValue('entity_type');
 
-    $form['entity_type'] = array(
+    $form['entity_type'] = [
       '#type' => 'select',
       '#title' => $this->t('Entity type'),
       '#options' => $this->getEntityTypeOptions(),
       '#default_value' => $entity_type_id,
       '#description' => $this->t("Entity type for which this button is to enabled."),
       '#required' => TRUE,
-      '#ajax' => array(
-        'callback' => array($form_state->getFormObject(), 'updateTypeSettings'),
+      '#ajax' => [
+        'callback' => [$form_state->getFormObject(), 'updateTypeSettings'],
         'effect' => 'fade',
-      ),
+      ],
       '#disabled' => !$embed_button->isNew(),
-    );
+    ];
 
     if ($entity_type_id) {
       $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
-      $form['bundles'] = array(
+      $form['bundles'] = [
         '#type' => 'checkboxes',
         '#title' => $entity_type->getBundleLabel() ?: $this->t('Bundles'),
         '#options' => $this->getEntityBundleOptions($entity_type),
         '#default_value' => $this->getConfigurationValue('bundles'),
         '#description' => $this->t('If none are selected, all are allowed.'),
-      );
+      ];
       $form['bundles']['#access'] = !empty($form['bundles']['#options']);
 
       // Allow option to limit Entity Embed Display plugins.
-      $form['display_plugins'] = array(
+      $form['display_plugins'] = [
         '#type' => 'checkboxes',
         '#title' => $this->t('Allowed Entity Embed Display plugins'),
         '#options' => $this->displayPluginManager->getDefinitionOptionsForEntityType($entity_type_id),
         '#default_value' => $this->getConfigurationValue('display_plugins'),
         '#description' => $this->t('If none are selected, all are allowed. Note that these are the plugins which are allowed for this entity type, all of these might not be available for the selected entity.'),
-      );
+      ];
       $form['display_plugins']['#access'] = !empty($form['display_plugins']['#options']);
 
       /** @var \Drupal\entity_browser\EntityBrowserInterface[] $browsers */
@@ -258,7 +258,7 @@ class Entity extends EmbedTypeBase implements ContainerFactoryPluginInterface {
    *   An array of bundle labels, keyed by bundle name.
    */
   protected function getEntityBundleOptions(EntityTypeInterface $entity_type) {
-    $bundle_options = array();
+    $bundle_options = [];
     // If the entity has bundles, allow option to restrict to bundle(s).
     if ($entity_type->hasKey('bundle')) {
       foreach ($this->entityTypeBundleInfo->getBundleInfo($entity_type->id()) as $bundle_id => $bundle_info) {

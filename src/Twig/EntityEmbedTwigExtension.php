@@ -57,9 +57,9 @@ class EntityEmbedTwigExtension extends \Twig_Extension {
    * {@inheritdoc}
    */
   public function getFunctions() {
-    return array(
+    return [
       new \Twig_SimpleFunction('entity_embed', [$this, 'getRenderArray']),
-    );
+    ];
   }
 
   /**

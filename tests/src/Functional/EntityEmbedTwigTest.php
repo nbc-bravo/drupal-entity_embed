@@ -14,7 +14,7 @@ class EntityEmbedTwigTest extends EntityEmbedTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    \Drupal::service('theme_handler')->install(array('test_theme'));
+    \Drupal::service('theme_handler')->install(['test_theme']);
   }
 
   /**
