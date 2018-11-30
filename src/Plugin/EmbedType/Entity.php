@@ -102,7 +102,9 @@ class Entity extends EmbedTypeBase implements ContainerFactoryPluginInterface {
       'bundles' => [],
       'display_plugins' => [],
       'entity_browser' => '',
-      'entity_browser_settings' => [],
+      'entity_browser_settings' => [
+        'display_review' => 0,
+      ],
     ];
   }
 
