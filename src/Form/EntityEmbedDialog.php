@@ -252,6 +252,7 @@ class EntityEmbedDialog extends FormBase {
         '#default_value' => $entity,
         '#required' => TRUE,
         '#description' => $this->t('Type label and pick the right one from suggestions. Note that the unique ID will be saved.'),
+        '#maxlength' => 255,
       );
       if ($bundles = $embed_button->getTypeSetting('bundles')) {
         $form['entity_id']['#selection_settings']['target_bundles'] = $bundles;
