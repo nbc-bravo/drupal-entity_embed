@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\entity_embed\Tests;
+namespace Drupal\Tests\entity_embed\Functional;
 
 /**
  * Tests the entity_embed filter.
@@ -14,7 +14,7 @@ class EntityEmbedFilterTest extends EntityEmbedTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'file',
     'image',
     'entity_embed',

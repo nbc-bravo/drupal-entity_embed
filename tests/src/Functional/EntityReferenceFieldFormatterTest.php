@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\entity_embed\Tests;
+namespace Drupal\Tests\entity_embed\Functional;
 
 use Drupal\Core\Form\FormState;
 
@@ -19,7 +19,7 @@ class EntityReferenceFieldFormatterTest extends EntityEmbedTestBase {
   protected $menu;
 
   /**
-   *
+   * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();

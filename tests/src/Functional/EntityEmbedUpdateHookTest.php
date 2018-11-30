@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\entity_embed\Tests;
+namespace Drupal\Tests\entity_embed\Functional;
 
-use Drupal\system\Tests\Update\UpdatePathTestBase;
+use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 
 /**
  * Tests the update hooks in entity_embed module.
@@ -17,7 +17,7 @@ class EntityEmbedUpdateHookTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles() {
     $this->databaseDumpFiles = [
       DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-8.bare.standard.php.gz',
-      __DIR__ . '/../../tests/fixtures/update/entity_embed.update-hook-test.php',
+      __DIR__ . '/../../fixtures/update/entity_embed.update-hook-test.php',
     ];
   }
 

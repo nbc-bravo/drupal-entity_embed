@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\entity_embed\Tests;
+namespace Drupal\Tests\entity_embed\Functional;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Form\FormState;
@@ -34,7 +34,7 @@ class ImageFieldFormatterTest extends EntityEmbedTestBase {
   protected $file;
 
   /**
-   *
+   * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();

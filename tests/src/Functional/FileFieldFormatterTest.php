@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\entity_embed\Tests;
+namespace Drupal\Tests\entity_embed\Functional;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Form\FormState;
@@ -27,7 +27,7 @@ class FileFieldFormatterTest extends EntityEmbedTestBase {
   protected $file;
 
   /**
-   *
+   * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
@@ -62,7 +62,7 @@ class FileFieldFormatterTest extends EntityEmbedTestBase {
         ->createInstance($plugin, []);
       $display->setContextValue('entity', $this->file);
       $conf_form = $display->buildConfigurationForm($form, $form_state);
-      $this->assertTrue(array_key_exists('description', $conf_form));
+      $this->assertArrayHasKey('description', $conf_form);
       $this->assertIdentical($conf_form['description']['#type'], 'textfield');
       $this->assertIdentical((string) $conf_form['description']['#title'], 'Description');
     }

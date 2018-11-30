@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\entity_embed\Tests;
+namespace Drupal\Tests\entity_embed\Functional;
 
 /**
  * Tests the hooks provided by entity_embed module.
@@ -17,7 +17,7 @@ class EntityEmbedHooksTest extends EntityEmbedTestBase {
   protected $state;
 
   /**
-   *
+   * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();

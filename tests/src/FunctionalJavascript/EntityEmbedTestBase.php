@@ -1,24 +1,27 @@
 <?php
 
-namespace Drupal\entity_embed\Tests;
+namespace Drupal\Tests\entity_embed\FunctionalJavascript;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\editor\Entity\Editor;
 use Drupal\file\Entity\File;
 use Drupal\filter\Entity\FilterFormat;
-use Drupal\simpletest\WebTestBase;
+use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\TestFileCreationTrait;
 
 /**
  * Base class for all entity_embed tests.
  */
-abstract class EntityEmbedTestBase extends WebTestBase {
+abstract class EntityEmbedTestBase extends WebDriverTestBase {
+
+  use TestFileCreationTrait;
 
   /**
    * Modules to enable.
    *
    * @var array
    */
-  public static $modules = ['entity_embed', 'entity_embed_test', 'node', 'ckeditor'];
+  protected static $modules = ['entity_embed', 'entity_embed_test', 'node', 'ckeditor'];
 
   /**
    * The test user.
@@ -35,7 +38,7 @@ abstract class EntityEmbedTestBase extends WebTestBase {
   protected $node;
 
   /**
-   *
+   * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
@@ -95,7 +98,7 @@ abstract class EntityEmbedTestBase extends WebTestBase {
    */
   protected function getTestFile($type_name, $size = NULL) {
     // Get a file to upload.
-    $file = current($this->drupalGetTestFiles($type_name, $size));
+    $file = current($this->getTestFiles($type_name, $size));
 
     // Add a filesize property to files as would be read by
     // \Drupal\file\Entity\File::load().
