@@ -298,6 +298,16 @@ class Entity extends EmbedTypeBase implements ContainerFactoryPluginInterface {
       $this->calculatePluginDependencies($instance);
     }
 
+    $entity_browser = $this->getConfigurationValue('entity_browser');
+    if ($entity_browser && $this->entityTypeManager->hasDefinition('entity_browser')) {
+      $browser = $this->entityTypeManager
+        ->getStorage('entity_browser')
+        ->load($entity_browser);
+      if ($browser) {
+        $this->addDependency($browser->getConfigDependencyKey(), $browser->getConfigDependencyName());
+      }
+    }
+
     return $this->dependencies;
   }
 
