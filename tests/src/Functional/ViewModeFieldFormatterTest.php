@@ -53,4 +53,28 @@ class ViewModeFieldFormatterTest extends EntityEmbedTestBase {
     }
   }
 
+  /**
+   * Tests dependencies on EntityViewMode config entities.
+   */
+  public function testViewModeDependencies() {
+    $button = $this->container
+      ->get('entity_type.manager')
+      ->getStorage('embed_button')
+      ->load('node');
+
+    $config = $button->get('type_settings');
+    $config['display_plugins'] = ['view_mode:node.teaser'];
+    $button->set('type_settings', $config);
+    $button->save();
+    $dependencies = $button->getDependencies();
+    $this->assertContains('core.entity_view_mode.node.teaser', $dependencies['config']);
+
+    // Test that removing teaser view mode removes the dependency.
+    $config['display_plugins'] = ['view_mode:node.full'];
+    $button->set('type_settings', $config);
+    $button->save();
+    $dependencies = $button->getDependencies();
+    $this->assertNotContains('core.entity_view_mode.node.teaser', $dependencies['config']);
+  }
+
 }
