@@ -88,7 +88,6 @@ class EntityEmbedBuilder implements EntityEmbedBuilderInterface {
     // alter the result before rendering.
     $build = [
       '#theme_wrappers' => ['entity_embed_container'],
-      '#attributes' => ['class' => ['embedded-entity']],
       '#entity' => $entity,
       '#context' => $context,
     ];
@@ -99,18 +98,11 @@ class EntityEmbedBuilder implements EntityEmbedBuilderInterface {
       $context
     );
 
-    // Maintain data-align if it is there.
-    if (isset($context['data-align'])) {
-      $build['#attributes']['data-align'] = $context['data-align'];
+    // Maintain data- attributes.
+    if (isset($context)) {
+      $build['#attributes'] = $context;
     }
-    elseif ((isset($context['class']))) {
-      $build['#attributes']['class'][] = $context['class'];
-    }
-
-    // Maintain data-caption if it is there.
-    if (isset($context['data-caption'])) {
-      $build['#attributes']['data-caption'] = $context['data-caption'];
-    }
+    $build['#attributes']['class'] = isset($build['#attributes']['class']) ? $build['#attributes']['class'] . ' embedded-entity' : 'embedded-entity';
 
     // Make sure that access to the entity is respected.
     $build['#access'] = $entity->access('view', NULL, TRUE);
