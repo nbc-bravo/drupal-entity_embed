@@ -30,6 +30,8 @@ class EntityEmbedFilterTest extends EntityEmbedTestBase {
    * are passed. Also tests situations when embed fails.
    */
   public function testFilter() {
+    $assert_session = $this->assertSession();
+
     // Tests entity embed using entity ID and view mode.
     $content = '<drupal-entity data-entity-type="node" data-entity-id="' . $this->node->id() . '" data-view-mode="teaser">This placeholder should not be rendered.</drupal-entity>';
     $settings = [];
@@ -193,6 +195,27 @@ class EntityEmbedFilterTest extends EntityEmbedTestBase {
     $this->assertNoText($this->node->body->value, 'Embedded node exists in page.');
     $this->assertNoText(strip_tags($content), 'Placeholder does not appear in the output when embed is successful.');
     $this->assertRaw('<div class="embedded-entity"', 'Embed container found.');
+
+    // Tests the placeholder for missing entities.
+    $embedded_node = $this->drupalCreateNode([
+      'type' => 'page',
+      'title' => 'Embedded node',
+      'body' => [['value' => 'Embedded text content', 'format' => 'custom_format']],
+    ]);
+    $content = '<drupal-entity data-entity-type="node" data-entity-uuid="' . $embedded_node->uuid() . '" data-view-mode="default"></drupal-entity>';
+    $settings = [];
+    $settings['type'] = 'page';
+    $settings['title'] = 'Host node';
+    $settings['body'] = [['value' => $content, 'format' => 'custom_format']];
+    $node = $this->drupalCreateNode($settings);
+    $this->drupalGet('node/' . $node->id());
+    $assert_session->pageTextContains('Embedded text content');
+    $assert_session->elementNotExists('css', 'img[alt^="Deleted content encountered, site owner alerted"]');
+    $embedded_node->delete();
+    $this->drupalGet('node/' . $node->id());
+    $assert_session->pageTextNotContains('Embedded text content');
+    $placeholder = $assert_session->elementExists('css', 'img[alt^="Deleted content encountered, site owner alerted"]');
+    $this->assertTrue(strpos($placeholder->getAttribute('src'), 'core/modules/media/images/icons/no-thumbnail.png') > 0);
   }
 
 }
