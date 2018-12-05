@@ -2,6 +2,9 @@
 
 namespace Drupal\Tests\entity_embed\Functional;
 
+use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\node\Entity\Node;
+
 /**
  * Tests the entity_embed filter.
  *
@@ -15,6 +18,7 @@ class EntityEmbedFilterTest extends EntityEmbedTestBase {
    * @var array
    */
   protected static $modules = [
+    'content_translation',
     'file',
     'image',
     'entity_embed',
@@ -226,6 +230,61 @@ class EntityEmbedFilterTest extends EntityEmbedTestBase {
     $assert_session->pageTextNotContains('Embedded text content');
     $placeholder = $assert_session->elementExists('css', 'img[alt^="Deleted content encountered, site owner alerted"]');
     $this->assertTrue(strpos($placeholder->getAttribute('src'), 'core/modules/media/images/icons/no-thumbnail.png') > 0);
+  }
+
+  /**
+   * Tests the filter in different translation contexts.
+   */
+  public function testTranslation() {
+    $content = '<drupal-entity data-entity-type="node" data-entity-uuid="' . $this->node->uuid() . '" data-entity-embed-display="entity_reference:entity_reference_label" data-entity-embed-settings=\'{"link":"0"}\' data-align="left" data-caption="test caption">This placeholder should not be rendered.</drupal-entity>';
+
+    ConfigurableLanguage::createFromLangcode('pt-br')->save();
+    $host_entity = $this->drupalCreateNode([
+      'type' => 'page',
+      'body' => [
+        'value' => $content,
+        'format' => 'custom_format',
+      ],
+    ]);
+    $this->drupalGet($host_entity->toUrl());
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains($host_entity->getTitle());
+    $this->assertSession()->pageTextContains($this->node->getTitle());
+
+    // Translate the host entity, but keep the same body; only change the title.
+    $translated_host_entity = $host_entity->addTranslation('pt-br')
+      ->getTranslation('pt-br')
+      ->setTitle('Em portugues')
+      ->set('body', $host_entity->get('body')->getValue());
+    $translated_host_entity->save();
+    $this->drupalGet('/pt-br/node/' . $host_entity->id());
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains($translated_host_entity->getTitle());
+    // The embedded node does not have a Portuguese translation, so it should
+    // display in English.
+    $this->assertSession()->pageTextContains($this->node->getTitle());
+
+    // Translate the embedded entity to the same language as the host entity.
+    $this->node = Node::load($this->node->id());
+    $this->node->addTranslation('pt-br')
+      ->getTranslation('pt-br')
+      ->setTitle('Embed em portugues')
+      ->save();
+    $this->getSession()->reload();
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains($translated_host_entity->getTitle());
+    // The translated host entity now should show the matching translation of
+    // the embedded entity.
+    $this->assertSession()->pageTextContains($this->node->getTranslation('pt-br')->getTitle());
+
+    // Change the translated host entity to explicitly embed the untranslated
+    // entity.
+    $translated_host_entity->body->value = '<drupal-entity data-entity-type="node" data-entity-uuid="' . $this->node->uuid() . '" data-entity-embed-display="entity_reference:entity_reference_label" data-entity-embed-settings=\'{"link":"0"}\' data-align="left" data-caption="test caption" data-langcode="' . $host_entity->language()->getId() . '">This placeholder should not be rendered.</drupal-entity>';
+    $translated_host_entity->save();
+    $this->getSession()->reload();
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains($translated_host_entity->getTitle());
+    $this->assertSession()->pageTextContains($this->node->getTitle());
   }
 
 }
