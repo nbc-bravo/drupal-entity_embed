@@ -21,7 +21,12 @@ abstract class EntityEmbedTestBase extends WebDriverTestBase {
    *
    * @var array
    */
-  protected static $modules = ['entity_embed', 'entity_embed_test', 'node', 'ckeditor'];
+  protected static $modules = [
+    'entity_embed',
+    'entity_embed_test',
+    'node',
+    'ckeditor',
+  ];
 
   /**
    * The test user.
@@ -84,10 +89,13 @@ abstract class EntityEmbedTestBase extends WebDriverTestBase {
     $this->drupalLogin($this->webUser);
 
     // Create a sample node to be embedded.
-    $settings = array();
+    $settings = [];
     $settings['type'] = 'page';
     $settings['title'] = 'Embed Test Node';
-    $settings['body'] = array('value' => 'This node is to be used for embedding in other nodes.', 'format' => 'custom_format');
+    $settings['body'] = [
+      'value' => 'This node is to be used for embedding in other nodes.',
+      'format' => 'custom_format',
+    ];
     $this->node = $this->drupalCreateNode($settings);
   }
 
@@ -95,6 +103,7 @@ abstract class EntityEmbedTestBase extends WebDriverTestBase {
    * Retrieves a sample file of the specified type.
    *
    * @return \Drupal\file\FileInterface
+   *   The created file entity.
    */
   protected function getTestFile($type_name, $size = NULL) {
     // Get a file to upload.

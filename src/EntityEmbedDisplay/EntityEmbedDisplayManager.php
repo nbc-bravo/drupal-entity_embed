@@ -113,7 +113,7 @@ class EntityEmbedDisplayManager extends DefaultPluginManager {
    *   Returns plugin definitions that should be displayed in the UI.
    */
   protected function filterExposedDefinitions(array $definitions) {
-    return array_filter($definitions, function($definition) {
+    return array_filter($definitions, function ($definition) {
       return empty($definition['no_ui']);
     });
   }

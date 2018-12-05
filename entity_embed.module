@@ -2,8 +2,7 @@
 
 /**
  * @file
- * Framework for allowing entities to be embedded using CKEditor plugin and text
- * format.
+ * Framework for allowing entities to be embedded in CKEditor.
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -28,6 +27,7 @@ function entity_embed_help($route_name, RouteMatchInterface $route_match) {
       return $output;
   }
 }
+
 /**
  * Implements hook_theme().
  */
@@ -49,14 +49,16 @@ function entity_embed_theme() {
  *   - element: An associative array containing the properties of the element.
  *     Properties used: #attributes, #children.
  */
-function template_preprocess_entity_embed_container(&$variables) {
+function template_preprocess_entity_embed_container(array &$variables) {
   $variables['element'] += ['#attributes' => []];
   $variables['attributes'] = $variables['element']['#attributes'];
   $variables['children'] = $variables['element']['#children'];
 }
 
 /**
- * Implements hook_entity_embed_display_plugins_alter() on behalf of file.module.
+ * Implements hook_entity_embed_display_plugins_alter().
+ *
+ * Implementation on behalf of the file module.
  */
 function file_entity_embed_display_plugins_alter(array &$plugins) {
   // The RSS enclosure field formatter is not usable for Entity Embed.
@@ -64,7 +66,9 @@ function file_entity_embed_display_plugins_alter(array &$plugins) {
 }
 
 /**
- * Implements hook_entity_embed_display_plugins_alter() on behalf of taxonomy.module.
+ * Implements hook_entity_embed_display_plugins_alter().
+ *
+ * Implementation on behalf of the taxonomy module.
  */
 function taxonomy_entity_embed_display_plugins_alter(array &$plugins) {
   // The RSS category field formatter is not usable for Entity Embed.
@@ -90,7 +94,7 @@ function entity_embed_entity_embed_display_plugins_for_context_alter(array &$def
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function entity_embed_form_filter_format_edit_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+function entity_embed_form_filter_format_edit_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
   // Add an additional validate callback so we can ensure the order of filters
   // is correct.
   $form['#validate'][] = 'entity_embed_filter_format_edit_form_validate';
@@ -117,13 +121,13 @@ function entity_embed_filter_format_edit_form_validate($form, FormStateInterface
     if (isset($filters['filter_align']['weight']) && $filters['filter_align']['weight'] <= $filters['entity_embed']['weight']) {
       $form_state->setErrorByName('filters', t('The %entity-embed-filter-label filter needs to be placed before the %align-filter-label filter.', [
         '%entity-embed-filter-label' => $get_filter_label('entity_embed'),
-        '%align-filter-label' => $get_filter_label('filter_align')
+        '%align-filter-label' => $get_filter_label('filter_align'),
       ]));
     }
     if (isset($filters['filter_caption']['weight']) && $filters['filter_caption']['weight'] <= $filters['entity_embed']['weight']) {
       $form_state->setErrorByName('filters', t('The %entity-embed-filter-label filter needs to be placed before the %caption-filter-label filter.', [
         '%entity-embed-filter-label' => $get_filter_label('entity_embed'),
-        '%caption-filter-label' => $get_filter_label('filter_caption')
+        '%caption-filter-label' => $get_filter_label('filter_caption'),
       ]));
     }
   }

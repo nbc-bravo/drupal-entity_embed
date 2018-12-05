@@ -36,8 +36,14 @@ class ImageFieldFormatter extends FileFieldFormatter {
   protected $imageFactory;
 
   /**
-   * {@inheritdoc}
+   * Constructs an ImageFieldFormatter object.
    *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity manager service.
    * @param \Drupal\Core\Field\FormatterPluginManager $formatter_plugin_manager

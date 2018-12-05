@@ -21,7 +21,12 @@ abstract class EntityEmbedTestBase extends BrowserTestBase {
    *
    * @var array
    */
-  protected static $modules = ['entity_embed', 'entity_embed_test', 'node', 'ckeditor'];
+  protected static $modules = [
+    'entity_embed',
+    'entity_embed_test',
+    'node',
+    'ckeditor',
+  ];
 
   /**
    * The test user.
@@ -95,6 +100,7 @@ abstract class EntityEmbedTestBase extends BrowserTestBase {
    * Retrieves a sample file of the specified type.
    *
    * @return \Drupal\file\FileInterface
+   *   The test file created.
    */
   protected function getTestFile($type_name, $size = NULL) {
     // Get a file to upload.

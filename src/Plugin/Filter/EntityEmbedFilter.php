@@ -158,7 +158,8 @@ class EntityEmbedFilter extends FilterBase implements ContainerFactoryPluginInte
             $depth--;
           }
           else {
-            $entity_output = '<img src="' . file_create_url('core/modules/media/images/icons/no-thumbnail.png') . '" width="180" height="180" alt="' . $this->t('Deleted content encountered, site owner alerted.') . '" />';
+            $alt_text = $this->t('Deleted content encountered, site owner alerted.');
+            $entity_output = '<img src="' . file_create_url('core/modules/media/images/icons/no-thumbnail.png') . '" width="180" height="180" alt="' . $alt_text . '" />';
             throw new EntityNotFoundException(sprintf('Unable to load embedded %s entity %s.', $entity_type, $id));
           }
         }

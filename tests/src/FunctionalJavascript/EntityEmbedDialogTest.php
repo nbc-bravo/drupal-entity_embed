@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\entity_embed\FunctionalJavascript;
 
-use Drupal\editor\Entity\Editor;
-
 /**
  * Tests the entity_embed dialog controller and route.
  *
@@ -68,12 +66,6 @@ class EntityEmbedDialogTest extends EntityEmbedTestBase {
     foreach ($plugins as $plugin) {
       $this->assertSession()->optionExists('Display as', $plugin);
     }
-    /*$this->drupalPostForm(NULL, $edit, 'Next');
-    // Ensure form structure of the 'embed' step and submit form.
-    $this->assertFieldByName('attributes[data-entity-embed-display]', 'Entity Embed Display plugin field is present.');
-
-    // Check that 'Embed' is a primary button.
-    $this->assertFieldByXPath('//input[contains(@class, "button--primary")]', 'Embed', 'Embed is a primary button');*/
   }
 
   /**

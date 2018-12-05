@@ -34,6 +34,7 @@ class EntityEmbedBuilder implements EntityEmbedBuilderInterface {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
    * @param \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayManager $display_manager
+   *   The entity embed display plugin manager.
    */
   public function __construct(ModuleHandlerInterface $module_handler, EntityEmbedDisplayManager $display_manager) {
     $this->moduleHandler = $module_handler;

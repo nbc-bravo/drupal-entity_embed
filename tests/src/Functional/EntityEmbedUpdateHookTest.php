@@ -41,7 +41,7 @@ class EntityEmbedUpdateHookTest extends UpdatePathTestBase {
   protected function doSelectionTest() {
     parent::doSelectionTest();
     $this->assertRaw('8002 -   Updates the default mode settings.');
-    $this->assertRaw('8003 -   Updates allowed HTML for all filter format config entities that have an  Entity Embed button.');
+    $this->assertRaw('8003 -   Updates allowed HTML for all filter configs that have an Entity Embed button.');
   }
 
   /**

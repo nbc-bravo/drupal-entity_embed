@@ -81,6 +81,8 @@ class EntityEmbedDialog extends FormBase {
 
   /**
    * The entity browser settings from the entity embed button.
+   *
+   * @var array
    */
   protected $entityBrowserSettings = [];
 
@@ -131,8 +133,12 @@ class EntityEmbedDialog extends FormBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Form constructor.
    *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
    * @param \Drupal\editor\EditorInterface $editor
    *   The editor to which this dialog corresponds.
    * @param \Drupal\embed\EmbedButtonInterface $embed_button
@@ -209,7 +215,8 @@ class EntityEmbedDialog extends FormBase {
    *   The form structure.
    */
   public function buildSelectStep(array &$form, FormStateInterface $form_state) {
-    // Entity element is calculated on every AJAX request/submit. See ::buildForm().
+    // Entity element is calculated on every AJAX request/submit.
+    // See self::buildForm().
     $entity_element = $form_state->get('entity_element');
     /** @var \Drupal\embed\EmbedButtonInterface $embed_button */
     $embed_button = $form_state->get('embed_button');
@@ -355,7 +362,8 @@ class EntityEmbedDialog extends FormBase {
    *   The form structure.
    */
   public function buildEmbedStep(array $form, FormStateInterface $form_state) {
-    // Entity element is calculated on every AJAX request/submit. See ::buildForm().
+    // Entity element is calculated on every AJAX request/submit.
+    // See self::buildForm().
     $entity_element = $form_state->get('entity_element');
     /** @var \Drupal\embed\EmbedButtonInterface $embed_button */
     $embed_button = $form_state->get('embed_button');
@@ -552,7 +560,11 @@ class EntityEmbedDialog extends FormBase {
         // Also log an exception.
         if (empty($display_plugin_options)) {
           $form_state->setError($element, $this->t('No display options available for the selected entity. Please select another entity.'));
-          $this->logger('entity_embed')->warning('No display options available for "@type:" entity "@id" while embedding using button "@button". Please ensure that at least one Entity Embed Display plugin is allowed for this embed button which is available for this entity.', ['@type' => $entity_type, '@id' => $entity->id(), '@button' => $embed_button->id()]);
+          $this->logger('entity_embed')->warning('No display options available for "@type:" entity "@id" while embedding using button "@button". Please ensure that at least one Entity Embed Display plugin is allowed for this embed button which is available for this entity.', [
+            '@type' => $entity_type,
+            '@id' => $entity->id(),
+            '@button' => $embed_button->id(),
+          ]);
         }
       }
     }
@@ -607,6 +619,8 @@ class EntityEmbedDialog extends FormBase {
    *   The form array.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
+   * @param string $step
+   *   The next step name, such as 'select', 'review' or 'embed'.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The ajax response.
@@ -718,8 +732,8 @@ class EntityEmbedDialog extends FormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param FormStateInterface $form_state
-   *   An associative array containing the current state of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state object.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The ajax response.
@@ -756,11 +770,12 @@ class EntityEmbedDialog extends FormBase {
       }
 
       // Filter out empty attributes.
-      $values['attributes'] = array_filter($values['attributes'], function($value) {
+      $values['attributes'] = array_filter($values['attributes'], function ($value) {
         return (bool) Unicode::strlen((string) $value);
       });
 
-      // Allow other modules to alter the values before getting submitted to the WYSIWYG.
+      // Allow other modules to alter the values before getting submitted to the
+      // WYSIWYG.
       $this->moduleHandler->alter('entity_embed_values', $values, $entity, $display, $form_state);
 
       $response->addCommand(new EditorDialogSave($values));
@@ -783,8 +798,7 @@ class EntityEmbedDialog extends FormBase {
   }
 
   /**
-   * Returns the allowed Entity Embed Display plugins given an embed button and
-   * an entity.
+   * Returns the allowed display plugins given an embed button and an entity.
    *
    * @param \Drupal\embed\EmbedButtonInterface $embed_button
    *   The embed button.
@@ -806,8 +820,10 @@ class EntityEmbedDialog extends FormBase {
   }
 
   /**
-   * Registers JS callback that gets entities from entity browser and updates
-   * form values accordingly.
+   * Registers JS callbacks.
+   *
+   * Callbacks are responsible for getting entities from entity browser and
+   * updating form values accordingly.
    */
   public function registerJSCallback(RegisterJSCallbacks $event) {
     if ($event->getBrowserID() == $this->entityBrowser->id()) {
@@ -819,6 +835,7 @@ class EntityEmbedDialog extends FormBase {
    * Load the current entity browser and its settings from the form state.
    *
    * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state object.
    */
   protected function loadEntityBrowser(FormStateInterface $form_state) {
     $this->entityBrowser = NULL;
