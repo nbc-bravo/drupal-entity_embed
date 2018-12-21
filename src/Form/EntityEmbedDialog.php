@@ -472,7 +472,8 @@ class EntityEmbedDialog extends FormBase {
     if ($editor->getFilterFormat()->filters('filter_caption')->status) {
       $form['attributes']['data-caption'] = [
         '#title' => $this->t('Caption'),
-        '#type' => 'textfield',
+        '#type' => 'textarea',
+        '#rows' => 3,
         '#default_value' => isset($entity_element['data-caption']) ? Html::decodeEntities($entity_element['data-caption']) : '',
         '#element_validate' => ['::escapeValue'],
       ];
